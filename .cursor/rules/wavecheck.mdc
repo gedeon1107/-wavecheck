@@ -1,0 +1,27 @@
+---
+description: Règles de projet WaveCheck (HTML/CSS/JS statique)
+alwaysApply: true
+---
+
+# WaveCheck — conventions
+
+- Le projet est **statique** (pas de bundler). Les pages HTML sont dans `html/`.
+- Les chemins doivent rester **relatifs** (ex: `../styles/style.css`, `../scripts/i18n.js`).
+- Couleur principale UI: `#1A73E8`.
+
+## Front (HTML)
+
+- Conserver une navigation cohérente sur toutes les pages.
+- Préférer des attributs `data-i18n="clé"` sur le texte UI.
+
+## JS
+
+- Pas de dépendances npm. Utiliser les CDN (Leaflet, Chart.js, i18next, Firebase).
+- Éviter les variables globales non nécessaires; exposer uniquement des helpers simples sur `window.WaveCheck` si besoin.
+- Toute intégration externe doit rester **gratuite** et avoir un fallback si indisponible.
+
+## Données & réseau
+
+- `ip-api.com` est utilisé côté client (public). Gérer l’échec réseau proprement.
+- Firebase est **optionnel**: si `firebase/config.js` n’est pas rempli, les appels DB doivent être no-op (pas de crash).
+

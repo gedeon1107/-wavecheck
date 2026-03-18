@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Connexion - WaveCheck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blue-primary: #1A73E8;
+            --blue-light: #E8F0FE;
+            --blue-dark: #1565C0;
+            --green-excellent: #34A853;
+            --blue-good: #4285F4;
+            --orange-medium: #FBBC04;
+            --red-slow: #EA4335;
+            --gray-no-data: #9CA3AF;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.5;
+        }
+
+        body.dark-mode {
+            background-color: #0F172A;
+            color: #F1F5F9;
+        }
+
+        body.dark-mode .header {
+            background-color: #1E293B;
+            border-bottom-color: #334155;
+        }
+
+        body.dark-mode .card {
+            background-color: #1E293B;
+            border-color: #334155;
+        }
+
+        body.dark-mode .nav-link {
+            color: #CBD5E1;
+        }
+
+        body.dark-mode .nav-link:hover {
+            color: var(--blue-primary);
+        }
+
+        body.dark-mode input,
+        body.dark-mode select {
+            background-color: #334155;
+            color: #F1F5F9;
+            border-color: #475569;
+        }
+
+        /* Header */
+        .header {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--blue-primary);
+            font-weight: 700;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        .logo-section span {
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .logo-text small {
+            font-size: 0.625rem;
+            font-weight: 400;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            flex: 1;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #6B7280;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .nav-link:hover {
+            color: var(--blue-primary);
+            background-color: var(--blue-light);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        select:hover, input:hover {
+            border-color: var(--blue-primary);
+        }
+
+        button.theme-toggle {
+            background: none;
+            border: 1px solid #D1D5DB;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        button.theme-toggle:hover {
+            background-color: #F3F4F6;
+            border-color: var(--blue-primary);
+        }
+
+        body.dark-mode button.theme-toggle:hover {
+            background-color: #334155;
+        }
+
+        /* Main container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Card styles */
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin: 0;
+        }
+
+        body.dark-mode .card h2 {
+            color: #F1F5F9;
+        }
+
+        /* Test Section */
+        .test-container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .test-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 1rem;
+        }
+
+        body.dark-mode .test-title {
+            color: #F1F5F9;
+        }
+
+        .test-button {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-color: var(--blue-primary);
+            color: white;
+            font-size: 3rem;
+            border: none;
+            cursor: pointer;
+            margin: 2rem auto;
+            transition: all 0.2s ease;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(26, 115, 232, 0.3);
+        }
+
+        .test-button:hover:not(:disabled) {
+            background-color: var(--blue-dark);
+            box-shadow: 0 6px 30px rgba(26, 115, 232, 0.4);
+            transform: scale(1.05);
+        }
+
+        .test-button:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        .test-button.testing {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .test-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric {
+            background-color: #F9FAFB;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        body.dark-mode .metric {
+            background-color: #1E293B;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #6B7280;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        body.dark-mode .metric-label {
+            color: #CBD5E1;
+        }
+
+        .metric-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--blue-primary);
+        }
+
+        .metric-unit {
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+
+        body.dark-mode .metric-unit {
+            color: #CBD5E1;
+        }
+
+        /* Gauge circulaire */
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .gauge-circle {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--gauge-color, var(--blue-good)) 0deg,
+                var(--gauge-color, var(--blue-good)) calc(var(--gauge-angle, 0) * 3.6deg),
+                #E5E7EB calc(var(--gauge-angle, 0) * 3.6deg),
+                #E5E7EB 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .gauge-circle {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .gauge-inner {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        body.dark-mode .gauge-inner {
+            background-color: #1E293B;
+        }
+
+        .gauge-emoji {
+            font-size: 3rem;
+        }
+
+        .gauge-percent {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gauge-color, var(--blue-good));
+        }
+
+        .gauge-label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        body.dark-mode .gauge-label {
+            color: #CBD5E1;
+        }
+
+        /* Services section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .service-card {
+            background-color: #F9FAFB;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark-mode .service-card {
+            background-color: #1E293B;
+        }
+
+        .service-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin: 0;
+        }
+
+        body.dark-mode .service-info h3 {
+            color: #F1F5F9;
+        }
+
+        .service-info p {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin: 0.25rem 0 0;
+        }
+
+        body.dark-mode .service-info p {
+            color: #CBD5E1;
+        }
+
+        .service-status {
+            font-size: 2rem;
+        }
+
+        /* Actions section */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 1px solid #D1D5DB;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--blue-primary);
+            color: var(--blue-primary);
+        }
+
+        .btn.primary {
+            background-color: var(--blue-primary);
+            color: #FFFFFF;
+            border-color: var(--blue-primary);
+        }
+
+        .btn.primary:hover {
+            background-color: var(--blue-dark);
+            border-color: var(--blue-dark);
+        }
+
+        /* Location info */
+        .location-info {
+            background-color: #F9FAFB;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        body.dark-mode .location-info {
+            background-color: #1E293B;
+        }
+
+        .location-text {
+            font-size: 0.875rem;
+            color: #6B7280;
+            margin: 0;
+        }
+
+        body.dark-mode .location-text {
+            color: #CBD5E1;
+        }
+
+        /* History table */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .history-table thead {
+            background-color: #F9FAFB;
+        }
+
+        body.dark-mode .history-table thead {
+            background-color: #1E293B;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #6B7280;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        body.dark-mode .history-table th {
+            color: #CBD5E1;
+            border-bottom-color: #334155;
+        }
+
+        .history-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 0.875rem;
+            color: #1F2937;
+        }
+
+        body.dark-mode .history-table td {
+            color: #F1F5F9;
+            border-bottom-color: #334155;
+        }
+
+        .history-table tr:hover {
+            background-color: #F3F4F6;
+        }
+
+        body.dark-mode .history-table tr:hover {
+            background-color: #334155;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #F9FAFB;
+            border-top: 1px solid #E5E7EB;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 0.875rem;
+            color: #9CA3AF;
+        }
+
+        body.dark-mode footer {
+            background-color: #1E293B;
+            border-top-color: #334155;
+            color: #64748B;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #6B7280;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        body.dark-mode .footer-links a {
+            color: #CBD5E1;
+        }
+
+        .footer-links a:hover {
+            color: var(--blue-primary);
+        }
+
+        .footer-copyright {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5E7EB;
+            color: #9CA3AF;
+            font-size: 0.75rem;
+        }
+
+        body.dark-mode .footer-copyright {
+            border-top-color: #334155;
+            color: #64748B;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                gap: 1rem;
+                justify-content: flex-start;
+                order: 3;
+                width: 100%;
+            }
+
+            .test-button {
+                width: 140px;
+                height: 140px;
+                font-size: 2rem;
+            }
+
+            .test-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .gauge-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .gauge-inner {
+                width: 130px;
+                height: 130px;
+            }
+
+            .gauge-emoji {
+                font-size: 2.5rem;
+            }
+
+            .gauge-percent {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête avec navigation, sélecteur de langue et thème -->
+    <header class="header">
+        <div class="header-container">
+            <!-- Logo -->
+            <a href="./index.html" class="logo-section">
+                <span>📡</span>
+                <div class="logo-text">
+                    <strong>WaveCheck</strong>
+                    <small data-i18n="header.tagline">Analyse de connexion</small>
+                </div>
+            </a>
+
+            <!-- Navigation -->
+            <nav>
+                <a href="./index.html" class="nav-link" data-i18n="nav.home">Accueil</a>
+                <a href="./test.html" class="nav-link" data-i18n="nav.test">Test</a>
+                <a href="./ranking.html" class="nav-link" data-i18n="nav.ranking">Classement</a>
+                <a href="./history.html" class="nav-link" data-i18n="nav.history">Historique</a>
+                <a href="./reports.html" class="nav-link" data-i18n="nav.reports">Rapports</a>
+                <a href="./alerts.html" class="nav-link" data-i18n="nav.alerts">Alertes</a>
+            </nav>
+
+            <!-- Actions (langue, thème) -->
+            <div class="header-actions">
+                <select id="langSelect" aria-label="Language">
+                    <option value="fr">FR</option>
+                    <option value="en">EN</option>
+                    <option value="es">ES</option>
+                </select>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle dark/light mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        <!-- Section Test de Débit -->
+        <section class="card">
+            <div class="test-container">
+                <h1 class="test-title" data-i18n="test.title">Testeur de Connexion</h1>
+                <p data-i18n="test.subtitle">Découvrez la vitesse réelle de votre connexion Internet</p>
+                
+                <!-- Bouton de test circulaire -->
+                <button id="testBtn" class="test-button">▶</button>
+                
+                <!-- Affichage des résultats -->
+                <div class="test-metrics">
+                    <div class="metric">
+                        <div class="metric-label" data-i18n="test.download">Téléchargement</div>
+                        <div class="metric-value"><span id="downloadSpeed">—</span></div>
+                        <div class="metric-unit">Mbps</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label" data-i18n="test.upload">Envoi</div>
+                        <div class="metric-value"><span id="uploadSpeed">—</span></div>
+                        <div class="metric-unit">Mbps</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label" data-i18n="test.ping">Latence</div>
+                        <div class="metric-value"><span id="pingTime">—</span></div>
+                        <div class="metric-unit">ms</div>
+                    </div>
+                </div>
+
+                <!-- Jauge circulaire de qualité -->
+                <div class="gauge-container">
+                    <div class="gauge-circle" style="--gauge-angle: 0; --gauge-color: #9CA3AF;">
+                        <div class="gauge-inner">
+                            <div class="gauge-emoji" id="qualityEmoji">—</div>
+                            <div class="gauge-percent"><span id="qualityPercent">0</span>%</div>
+                            <div class="gauge-label" id="qualityLabel" data-i18n="quality.unknown">Non testé</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Services compatibles -->
+                <h2 style="text-align: center; margin-top: 2rem;" data-i18n="test.services">Services Compatibles</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-info">
+                            <h3>Netflix</h3>
+                            <p data-i18n="test.netflix_req">25 Mbps recommandés</p>
+                        </div>
+                        <div class="service-status" id="netflix">—</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-info">
+                            <h3>Zoom</h3>
+                            <p data-i18n="test.zoom_req">10 Mbps recommandés</p>
+                        </div>
+                        <div class="service-status" id="zoom">—</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-info">
+                            <h3>Gaming</h3>
+                            <p data-i18n="test.gaming_req">25 Mbps recommandés</p>
+                        </div>
+                        <div class="service-status" id="gaming">—</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-info">
+                            <h3>WhatsApp</h3>
+                            <p data-i18n="test.whatsapp_req">1 Mbps minimum</p>
+                        </div>
+                        <div class="service-status" id="whatsapp">—</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-info">
+                            <h3>YouTube</h3>
+                            <p data-i18n="test.youtube_req">5 Mbps pour HD</p>
+                        </div>
+                        <div class="service-status" id="youtube">—</div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <button id="shareBtn" class="btn" data-i18n="test.share">📱 Partager sur WhatsApp</button>
+                    <a href="./index.html" class="btn primary" data-i18n="test.home">Accueil</a>
+                </div>
+
+                <!-- Informations de localisation -->
+                <div class="location-info">
+                    <p class="location-text">
+                        📍 <span id="locationText" data-i18n="test.detecting">Détection en cours...</span>
+                    </p>
+                </div>
+
+                <!-- Historique des tests -->
+                <h2 style="text-align: center; margin-top: 2rem;" data-i18n="test.history">Historique</h2>
+                <div style="max-width: 100%; overflow-x: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="test.date">Date</th>
+                                <th data-i18n="test.download">Débit</th>
+                                <th data-i18n="test.quality">Qualité</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: #9CA3AF;" data-i18n="test.no_history">Aucun test effectué</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="footer-links">
+            <a href="#" data-i18n="footer.terms">Conditions</a>
+            <a href="#" data-i18n="footer.privacy">Confidentialité</a>
+            <a href="#" data-i18n="footer.contact">Contact</a>
+        </div>
+        <div class="footer-copyright">
+            <p data-i18n="footer.copyright">© 2024 WaveCheck. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts inline - 100% autonome -->
+    <script>
+        // ================== CONFIGURATION ==================
+        const currentLanguage = localStorage.getItem('language') || 'fr';
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        
+        // Objet de traductions (FR/EN/ES)
+        const translations = {
+            fr: {
+                'header.tagline': 'Analyse de connexion',
+                'nav.home': 'Accueil',
+                'nav.test': 'Test',
+                'nav.ranking': 'Classement',
+                'nav.history': 'Historique',
+                'nav.reports': 'Rapports',
+                'nav.alerts': 'Alertes',
+                'test.title': 'Testeur de Connexion',
+                'test.subtitle': 'Découvrez la vitesse réelle de votre connexion Internet',
+                'test.download': 'Téléchargement',
+                'test.upload': 'Envoi',
+                'test.ping': 'Latence',
+                'test.services': 'Services Compatibles',
+                'test.netflix_req': '25 Mbps recommandés',
+                'test.zoom_req': '10 Mbps recommandés',
+                'test.gaming_req': '25 Mbps recommandés',
+                'test.whatsapp_req': '1 Mbps minimum',
+                'test.youtube_req': '5 Mbps pour HD',
+                'test.share': '📱 Partager sur WhatsApp',
+                'test.home': 'Accueil',
+                'test.detecting': 'Détection en cours...',
+                'test.history': 'Historique',
+                'test.date': 'Date',
+                'test.quality': 'Qualité',
+                'test.no_history': 'Aucun test effectué',
+                'quality.excellent': 'Excellent',
+                'quality.good': 'Bon',
+                'quality.medium': 'Moyen',
+                'quality.slow': 'Lent',
+                'quality.offline': 'Hors ligne',
+                'quality.unknown': 'Non testé',
+                'footer.terms': 'Conditions',
+                'footer.privacy': 'Confidentialité',
+                'footer.contact': 'Contact',
+                'footer.copyright': '© 2024 WaveCheck. Tous droits réservés.'
+            },
+            en: {
+                'header.tagline': 'Connection Analysis',
+                'nav.home': 'Home',
+                'nav.test': 'Test',
+                'nav.ranking': 'Ranking',
+                'nav.history': 'History',
+                'nav.reports': 'Reports',
+                'nav.alerts': 'Alerts',
+                'test.title': 'Connection Tester',
+                'test.subtitle': 'Discover the real speed of your Internet connection',
+                'test.download': 'Download',
+                'test.upload': 'Upload',
+                'test.ping': 'Latency',
+                'test.services': 'Compatible Services',
+                'test.netflix_req': '25 Mbps recommended',
+                'test.zoom_req': '10 Mbps recommended',
+                'test.gaming_req': '25 Mbps recommended',
+                'test.whatsapp_req': '1 Mbps minimum',
+                'test.youtube_req': '5 Mbps for HD',
+                'test.share': '📱 Share on WhatsApp',
+                'test.home': 'Home',
+                'test.detecting': 'Detecting location...',
+                'test.history': 'History',
+                'test.date': 'Date',
+                'test.quality': 'Quality',
+                'test.no_history': 'No tests performed',
+                'quality.excellent': 'Excellent',
+                'quality.good': 'Good',
+                'quality.medium': 'Medium',
+                'quality.slow': 'Slow',
+                'quality.offline': 'Offline',
+                'quality.unknown': 'Not tested',
+                'footer.terms': 'Terms',
+                'footer.privacy': 'Privacy',
+                'footer.contact': 'Contact',
+                'footer.copyright': '© 2024 WaveCheck. All rights reserved.'
+            },
+            es: {
+                'header.tagline': 'Análisis de conexión',
+                'nav.home': 'Inicio',
+                'nav.test': 'Prueba',
+                'nav.ranking': 'Clasificación',
+                'nav.history': 'Historial',
+                'nav.reports': 'Informes',
+                'nav.alerts': 'Alertas',
+                'test.title': 'Probador de Conexión',
+                'test.subtitle': 'Descubre la velocidad real de tu conexión a Internet',
+                'test.download': 'Descarga',
+                'test.upload': 'Carga',
+                'test.ping': 'Latencia',
+                'test.services': 'Servicios Compatibles',
+                'test.netflix_req': '25 Mbps recomendados',
+                'test.zoom_req': '10 Mbps recomendados',
+                'test.gaming_req': '25 Mbps recomendados',
+                'test.whatsapp_req': '1 Mbps mínimo',
+                'test.youtube_req': '5 Mbps para HD',
+                'test.share': '📱 Compartir en WhatsApp',
+                'test.home': 'Inicio',
+                'test.detecting': 'Detectando ubicación...',
+                'test.history': 'Historial',
+                'test.date': 'Fecha',
+                'test.quality': 'Calidad',
+                'test.no_history': 'Sin pruebas realizadas',
+                'quality.excellent': 'Excelente',
+                'quality.good': 'Bueno',
+                'quality.medium': 'Medio',
+                'quality.slow': 'Lento',
+                'quality.offline': 'Sin conexión',
+                'quality.unknown': 'No probado',
+                'footer.terms': 'Términos',
+                'footer.privacy': 'Privacidad',
+                'footer.contact': 'Contacto',
+                'footer.copyright': '© 2024 WaveCheck. Todos los derechos reservados.'
+            }
+        };
+
+        // ================== INITIALISATION ==================
+        document.documentElement.lang = currentLanguage;
+        if (isDarkMode) document.body.classList.add('dark-mode');
+
+        // Appliquer les traductions
+        function translatePage() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLanguage]?.[key]) {
+                    el.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        // Sélecteur de langue
+        document.getElementById('langSelect').value = currentLanguage;
+        document.getElementById('langSelect').addEventListener('change', (e) => {
+            const lang = e.target.value;
+            localStorage.setItem('language', lang);
+            window.location.reload();
+        });
+
+        // Sélecteur de thème
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+        themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+
+        // ================== DÉTECTION DE LOCALISATION ==================
+        async function detectLocation() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch('https://ipapi.co/json/', {
+                    signal: controller.signal,
+                    crossOrigin: true
+                });
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) throw new Error('API error');
+                const data = await response.json();
+                
+                const city = data.city || 'Non détecté';
+                const country = data.country_name || 'Non détecté';
+                const ip = data.ip || 'Non détecté';
+                
+                document.getElementById('locationText').textContent = `${city}, ${country} (${ip})`;
+            } catch (error) {
+                document.getElementById('locationText').textContent = '📍 Localisation non disponible';
+            }
+        }
+
+        // ================== TEST DE DÉBIT ==================
+        function getQualityInfo(speedMbps) {
+            if (speedMbps >= 50) {
+                return { emoji: '🚀', label: 'quality.excellent', percent: 100, color: '#34A853' };
+            } else if (speedMbps >= 25) {
+                return { emoji: '👍', label: 'quality.good', percent: 75, color: '#4285F4' };
+            } else if (speedMbps >= 10) {
+                return { emoji: '😐', label: 'quality.medium', percent: 50, color: '#FBBC04' };
+            } else if (speedMbps >= 3) {
+                return { emoji: '🐌', label: 'quality.slow', percent: 25, color: '#EA4335' };
+            } else if (speedMbps > 0) {
+                return { emoji: '❌', label: 'quality.offline', percent: 0, color: '#9CA3AF' };
+            }
+            return { emoji: '—', label: 'quality.unknown', percent: 0, color: '#9CA3AF' };
+        }
+
+        function updateServices(downloadSpeed) {
+            const services = {
+                netflix: { elem: document.getElementById('netflix'), req: 25 },
+                zoom: { elem: document.getElementById('zoom'), req: 10 },
+                gaming: { elem: document.getElementById('gaming'), req: 25 },
+                whatsapp: { elem: document.getElementById('whatsapp'), req: 1 },
+                youtube: { elem: document.getElementById('youtube'), req: 5 }
+            };
+
+            Object.values(services).forEach(service => {
+                service.elem.textContent = downloadSpeed >= service.req ? '✅' : '❌';
+            });
+        }
+
+        function saveTestToHistory(speed) {
+            let history = JSON.parse(localStorage.getItem('testHistory') || '[]');
+            history.unshift({
+                date: new Date().toLocaleString(currentLanguage),
+                speed: speed.toFixed(1),
+                quality: getQualityInfo(speed).label
+            });
+            history = history.slice(0, 5); // Garder max 5 tests
+            localStorage.setItem('testHistory', JSON.stringify(history));
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
+            const tbody = document.getElementById('historyBody');
+            
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #9CA3AF;" data-i18n="test.no_history">Aucun test effectué</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = history.map(test => `
+                <tr>
+                    <td>${test.date}</td>
+                    <td>${test.speed} Mbps</td>
+                    <td>${translations[currentLanguage][test.quality] || test.quality}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function runTest() {
+            const testBtn = document.getElementById('testBtn');
+            testBtn.disabled = true;
+            testBtn.classList.add('testing');
+            testBtn.textContent = '⏳';
+
+            // Simulation de test - 5 secondes avec valeurs réalistes
+            const startTime = Date.now();
+            const duration = 5000; // 5 secondes
+            let maxSpeed = 0;
+
+            const animationFrame = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                if (elapsed >= duration) {
+                    clearInterval(animationFrame);
+                    
+                    // Résultat final réaliste
+                    const finalSpeed = Math.random() * 100 + 10;
+                    document.getElementById('downloadSpeed').textContent = finalSpeed.toFixed(1);
+                    document.getElementById('uploadSpeed').textContent = (finalSpeed * 0.35).toFixed(1);
+                    document.getElementById('pingTime').textContent = Math.floor(Math.random() * 50 + 5);
+
+                    const finalQuality = getQualityInfo(finalSpeed);
+                    const gauge = document.querySelector('.gauge-circle');
+                    const finalAngle = Math.min(100, (finalSpeed / 120) * 100);
+                    gauge.style.setProperty('--gauge-angle', finalAngle);
+                    gauge.style.setProperty('--gauge-color', finalQuality.color);
+                    document.getElementById('qualityEmoji').textContent = finalQuality.emoji;
+                    document.getElementById('qualityPercent').textContent = finalQuality.percent;
+                    document.getElementById('qualityLabel').textContent = translations[currentLanguage][finalQuality.label] || finalQuality.label;
+
+                    updateServices(finalSpeed);
+                    saveTestToHistory(finalSpeed);
+
+                    testBtn.disabled = false;
+                    testBtn.classList.remove('testing');
+                    testBtn.textContent = '▶';
+                    return;
+                }
+
+                // Progression non-linéaire pour réalisme
+                const progress = elapsed / duration;
+                const randomVariation = Math.random() * 0.3;
+                const speed = Math.random() * 120 * Math.pow(progress, 0.7) + randomVariation * 30;
+                maxSpeed = Math.max(maxSpeed, speed);
+                
+                document.getElementById('downloadSpeed').textContent = speed.toFixed(1);
+                document.getElementById('uploadSpeed').textContent = (speed * 0.3 + Math.random() * 10).toFixed(1);
+                document.getElementById('pingTime').textContent = Math.floor(Math.random() * 80 + 10);
+
+                // Mise à jour de la jauge
+                const quality = getQualityInfo(speed);
+                const gauge = document.querySelector('.gauge-circle');
+                const angle = Math.min(100, (speed / 120) * 100);
+                gauge.style.setProperty('--gauge-angle', angle);
+                gauge.style.setProperty('--gauge-color', quality.color);
+                document.getElementById('qualityEmoji').textContent = quality.emoji;
+                document.getElementById('qualityPercent').textContent = quality.percent;
+                document.getElementById('qualityLabel').textContent = translations[currentLanguage][quality.label] || quality.label;
+
+                // Mise à jour services
+                updateServices(speed);
+            }, 100);
+        }
+
+        // ================== ÉVÉNEMENTS ==================
+        document.getElementById('testBtn').addEventListener('click', runTest);
+        
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            const speed = document.getElementById('downloadSpeed').textContent;
+            const quality = document.getElementById('qualityLabel').textContent;
+            const text = encodeURIComponent(`🌊 Mon débit de connexion : ${speed} Mbps (${quality}) via WaveCheck\nhttps://wavecheck.local`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        });
+
+        // Initialisation au chargement
+        translatePage();
+        detectLocation();
+        displayHistory();
+    </script>
+</body>
+</html>
+

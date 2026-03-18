@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classement Mondial - WaveCheck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blue-primary: #1A73E8;
+            --blue-light: #E8F0FE;
+            --blue-dark: #1565C0;
+            --green-excellent: #34A853;
+            --blue-good: #4285F4;
+            --orange-medium: #FBBC04;
+            --red-slow: #EA4335;
+            --gray-no-data: #9CA3AF;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.5;
+        }
+
+        body.dark-mode {
+            background-color: #0F172A;
+            color: #F1F5F9;
+        }
+
+        body.dark-mode .header {
+            background-color: #1E293B;
+            border-bottom-color: #334155;
+        }
+
+        body.dark-mode .card {
+            background-color: #1E293B;
+            border-color: #334155;
+        }
+
+        body.dark-mode .nav-link {
+            color: #CBD5E1;
+        }
+
+        body.dark-mode .nav-link:hover {
+            color: var(--blue-primary);
+        }
+
+        body.dark-mode input,
+        body.dark-mode select {
+            background-color: #334155;
+            color: #F1F5F9;
+            border-color: #475569;
+        }
+
+        /* Header */
+        .header {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--blue-primary);
+            font-weight: 700;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        .logo-section span {
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .logo-text small {
+            font-size: 0.625rem;
+            font-weight: 400;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            flex: 1;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #6B7280;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .nav-link:hover {
+            color: var(--blue-primary);
+            background-color: var(--blue-light);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        select:hover, input:hover {
+            border-color: var(--blue-primary);
+        }
+
+        button.theme-toggle {
+            background: none;
+            border: 1px solid #D1D5DB;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        button.theme-toggle:hover {
+            background-color: #F3F4F6;
+            border-color: var(--blue-primary);
+        }
+
+        body.dark-mode button.theme-toggle:hover {
+            background-color: #334155;
+        }
+
+        /* Main container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Card styles */
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin: 0 0 1rem 0;
+        }
+
+        body.dark-mode .card h2 {
+            color: #F1F5F9;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 0.5rem;
+        }
+
+        body.dark-mode .hero h1 {
+            color: #F1F5F9;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: #6B7280;
+        }
+
+        body.dark-mode .hero p {
+            color: #CBD5E1;
+        }
+
+        /* Position Card */
+        .position-card {
+            background: linear-gradient(135deg, var(--blue-primary) 0%, var(--blue-dark) 100%);
+            color: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        .position-rank {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .position-country {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .position-speed {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        /* Filters */
+        .filter-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.25rem;
+            border: 2px solid #D1D5DB;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--blue-primary);
+            color: var(--blue-primary);
+        }
+
+        .filter-btn.active {
+            background-color: var(--blue-primary);
+            color: white;
+            border-color: var(--blue-primary);
+        }
+
+        body.dark-mode .filter-btn {
+            background-color: #1E293B;
+            border-color: #334155;
+            color: #F1F5F9;
+        }
+
+        body.dark-mode .filter-btn:hover {
+            border-color: var(--blue-primary);
+            color: var(--blue-primary);
+        }
+
+        /* Table styles */
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .ranking-table thead {
+            background-color: #F9FAFB;
+        }
+
+        body.dark-mode .ranking-table thead {
+            background-color: #1E293B;
+        }
+
+        .ranking-table th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #6B7280;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        body.dark-mode .ranking-table th {
+            color: #CBD5E1;
+            border-bottom-color: #334155;
+        }
+
+        .ranking-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 0.875rem;
+            color: #1F2937;
+        }
+
+        body.dark-mode .ranking-table td {
+            color: #F1F5F9;
+            border-bottom-color: #334155;
+        }
+
+        .ranking-table tr:hover {
+            background-color: #F3F4F6;
+        }
+
+        body.dark-mode .ranking-table tr:hover {
+            background-color: #334155;
+        }
+
+        .rank-medal {
+            font-size: 1.25rem;
+            display: inline-block;
+        }
+
+        .quality-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .quality-excellent {
+            background-color: rgba(52, 168, 83, 0.1);
+            color: #34A853;
+        }
+
+        .quality-good {
+            background-color: rgba(66, 133, 244, 0.1);
+            color: #4285F4;
+        }
+
+        .quality-medium {
+            background-color: rgba(251, 188, 4, 0.1);
+            color: #FBBC04;
+        }
+
+        .quality-slow {
+            background-color: rgba(234, 67, 53, 0.1);
+            color: #EA4335;
+        }
+
+        .trend {
+            font-size: 1rem;
+        }
+
+        .trend.up {
+            color: #34A853;
+        }
+
+        .trend.down {
+            color: #EA4335;
+        }
+
+        .trend.stable {
+            color: #FBBC04;
+        }
+
+        /* Continental ranking */
+        .continental-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .continent-card {
+            background-color: #F9FAFB;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        body.dark-mode .continent-card {
+            background-color: #1E293B;
+        }
+
+        .continent-emoji {
+            font-size: 2rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .continent-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin: 0.5rem 0;
+        }
+
+        body.dark-mode .continent-name {
+            color: #F1F5F9;
+        }
+
+        .continent-speed {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--blue-primary);
+        }
+
+        .continent-label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-top: 0.5rem;
+        }
+
+        body.dark-mode .continent-label {
+            color: #CBD5E1;
+        }
+
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #F9FAFB;
+            border-top: 1px solid #E5E7EB;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 0.875rem;
+            color: #9CA3AF;
+        }
+
+        body.dark-mode footer {
+            background-color: #1E293B;
+            border-top-color: #334155;
+            color: #64748B;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #6B7280;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        body.dark-mode .footer-links a {
+            color: #CBD5E1;
+        }
+
+        .footer-links a:hover {
+            color: var(--blue-primary);
+        }
+
+        .footer-copyright {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5E7EB;
+            color: #9CA3AF;
+            font-size: 0.75rem;
+        }
+
+        body.dark-mode .footer-copyright {
+            border-top-color: #334155;
+            color: #64748B;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                gap: 1rem;
+                justify-content: flex-start;
+                order: 3;
+                width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .ranking-table {
+                font-size: 0.75rem;
+            }
+
+            .ranking-table th,
+            .ranking-table td {
+                padding: 0.5rem;
+            }
+
+            .continental-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête avec navigation, sélecteur de langue et thème -->
+    <header class="header">
+        <div class="header-container">
+            <!-- Logo -->
+            <a href="./index.html" class="logo-section">
+                <span>📡</span>
+                <div class="logo-text">
+                    <strong>WaveCheck</strong>
+                    <small data-i18n="header.tagline">Analyse de connexion</small>
+                </div>
+            </a>
+
+            <!-- Navigation -->
+            <nav>
+                <a href="./index.html" class="nav-link" data-i18n="nav.home">Accueil</a>
+                <a href="./test.html" class="nav-link" data-i18n="nav.test">Test</a>
+                <a href="./ranking.html" class="nav-link" data-i18n="nav.ranking">Classement</a>
+                <a href="./history.html" class="nav-link" data-i18n="nav.history">Historique</a>
+                <a href="./reports.html" class="nav-link" data-i18n="nav.reports">Rapports</a>
+                <a href="./alerts.html" class="nav-link" data-i18n="nav.alerts">Alertes</a>
+            </nav>
+
+            <!-- Actions (langue, thème) -->
+            <div class="header-actions">
+                <select id="langSelect" aria-label="Language">
+                    <option value="fr">FR</option>
+                    <option value="en">EN</option>
+                    <option value="es">ES</option>
+                </select>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle dark/light mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        <!-- Héro section -->
+        <section class="hero">
+            <h1 data-i18n="ranking.title">🏆 Classement Mondial</h1>
+            <p data-i18n="ranking.subtitle">Les pays avec la meilleure qualité internet</p>
+        </section>
+
+        <!-- Votre position -->
+        <section class="position-card">
+            <div>
+                <div data-i18n="ranking.your_position">Votre position</div>
+                <div class="position-rank" id="userRank">—</div>
+                <div class="position-country" id="userCountry">—</div>
+                <div class="position-speed" id="userSpeed">—</div>
+            </div>
+        </section>
+
+        <!-- Filtres -->
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all" data-i18n="ranking.all">Tous</button>
+            <button class="filter-btn" data-filter="africa" data-i18n="ranking.africa">Afrique 🌍</button>
+            <button class="filter-btn" data-filter="europe" data-i18n="ranking.europe">Europe 🌍</button>
+            <button class="filter-btn" data-filter="asia" data-i18n="ranking.asia">Asie 🌏</button>
+        </div>
+
+        <!-- Tableau de classement -->
+        <section class="card">
+            <h2 data-i18n="ranking.top_20">Top 20 Monde</h2>
+            <div style="overflow-x: auto;">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="ranking.rank">Rang</th>
+                            <th data-i18n="ranking.country">Pays</th>
+                            <th data-i18n="ranking.speed">Vitesse</th>
+                            <th data-i18n="ranking.quality">Qualité</th>
+                            <th data-i18n="ranking.trend">Tendance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Graphique Chart.js -->
+        <section class="card">
+            <h2 data-i18n="ranking.top_10_chart">Top 10 Mondial</h2>
+            <div class="chart-container">
+                <canvas id="rankingChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Classement par continent -->
+        <section class="card">
+            <h2 data-i18n="ranking.by_continent">Classement par Continent</h2>
+            <div class="continental-grid">
+                <div class="continent-card">
+                    <div class="continent-emoji">🌍</div>
+                    <div class="continent-name" data-i18n="ranking.europe">Europe</div>
+                    <div class="continent-speed" id="europeSpeed">105</div>
+                    <div class="continent-label" data-i18n="ranking.avg_speed">Vitesse moy.</div>
+                </div>
+                <div class="continent-card">
+                    <div class="continent-emoji">🌏</div>
+                    <div class="continent-name" data-i18n="ranking.asia">Asie</div>
+                    <div class="continent-speed" id="asiaSpeed">115</div>
+                    <div class="continent-label" data-i18n="ranking.avg_speed">Vitesse moy.</div>
+                </div>
+                <div class="continent-card">
+                    <div class="continent-emoji">🌎</div>
+                    <div class="continent-name" data-i18n="ranking.americas">Amériques</div>
+                    <div class="continent-speed" id="americasSpeed">75</div>
+                    <div class="continent-label" data-i18n="ranking.avg_speed">Vitesse moy.</div>
+                </div>
+                <div class="continent-card">
+                    <div class="continent-emoji">🌍</div>
+                    <div class="continent-name" data-i18n="ranking.africa">Afrique</div>
+                    <div class="continent-speed" id="africaSpeed">18</div>
+                    <div class="continent-label" data-i18n="ranking.avg_speed">Vitesse moy.</div>
+                </div>
+                <div class="continent-card">
+                    <div class="continent-emoji">🌏</div>
+                    <div class="continent-name" data-i18n="ranking.oceania">Océanie</div>
+                    <div class="continent-speed" id="oceaniaSpeed">95</div>
+                    <div class="continent-label" data-i18n="ranking.avg_speed">Vitesse moy.</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="footer-links">
+            <a href="#" data-i18n="footer.terms">Conditions</a>
+            <a href="#" data-i18n="footer.privacy">Confidentialité</a>
+            <a href="#" data-i18n="footer.contact">Contact</a>
+        </div>
+        <div class="footer-copyright">
+            <p data-i18n="footer.copyright">© 2024 WaveCheck. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts inline - 100% autonome -->
+    <script>
+        // ================== CONFIGURATION ==================
+        const currentLanguage = localStorage.getItem('language') || 'fr';
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        let currentFilter = 'all';
+        let chart = null;
+
+        // Objet de traductions (FR/EN/ES)
+        const translations = {
+            fr: {
+                'header.tagline': 'Analyse de connexion',
+                'nav.home': 'Accueil',
+                'nav.test': 'Test',
+                'nav.ranking': 'Classement',
+                'nav.history': 'Historique',
+                'nav.reports': 'Rapports',
+                'nav.alerts': 'Alertes',
+                'ranking.title': '🏆 Classement Mondial',
+                'ranking.subtitle': 'Les pays avec la meilleure qualité internet',
+                'ranking.your_position': 'Votre position',
+                'ranking.all': 'Tous',
+                'ranking.africa': 'Afrique',
+                'ranking.europe': 'Europe',
+                'ranking.asia': 'Asie',
+                'ranking.top_20': 'Top 20 Monde',
+                'ranking.rank': 'Rang',
+                'ranking.country': 'Pays',
+                'ranking.speed': 'Vitesse',
+                'ranking.quality': 'Qualité',
+                'ranking.trend': 'Tendance',
+                'ranking.top_10_chart': 'Top 10 Mondial',
+                'ranking.by_continent': 'Classement par Continent',
+                'ranking.americas': 'Amériques',
+                'ranking.oceania': 'Océanie',
+                'ranking.avg_speed': 'Vitesse moy.',
+                'quality.excellent': 'Excellent',
+                'quality.good': 'Bon',
+                'quality.medium': 'Moyen',
+                'quality.slow': 'Lent',
+                'footer.terms': 'Conditions',
+                'footer.privacy': 'Confidentialité',
+                'footer.contact': 'Contact',
+                'footer.copyright': '© 2024 WaveCheck. Tous droits réservés.'
+            },
+            en: {
+                'header.tagline': 'Connection Analysis',
+                'nav.home': 'Home',
+                'nav.test': 'Test',
+                'nav.ranking': 'Ranking',
+                'nav.history': 'History',
+                'nav.reports': 'Reports',
+                'nav.alerts': 'Alerts',
+                'ranking.title': '🏆 World Ranking',
+                'ranking.subtitle': 'Countries with the best internet quality',
+                'ranking.your_position': 'Your position',
+                'ranking.all': 'All',
+                'ranking.africa': 'Africa',
+                'ranking.europe': 'Europe',
+                'ranking.asia': 'Asia',
+                'ranking.top_20': 'Top 20 World',
+                'ranking.rank': 'Rank',
+                'ranking.country': 'Country',
+                'ranking.speed': 'Speed',
+                'ranking.quality': 'Quality',
+                'ranking.trend': 'Trend',
+                'ranking.top_10_chart': 'Top 10 World',
+                'ranking.by_continent': 'Ranking by Continent',
+                'ranking.americas': 'Americas',
+                'ranking.oceania': 'Oceania',
+                'ranking.avg_speed': 'Avg. speed',
+                'quality.excellent': 'Excellent',
+                'quality.good': 'Good',
+                'quality.medium': 'Medium',
+                'quality.slow': 'Slow',
+                'footer.terms': 'Terms',
+                'footer.privacy': 'Privacy',
+                'footer.contact': 'Contact',
+                'footer.copyright': '© 2024 WaveCheck. All rights reserved.'
+            },
+            es: {
+                'header.tagline': 'Análisis de conexión',
+                'nav.home': 'Inicio',
+                'nav.test': 'Prueba',
+                'nav.ranking': 'Clasificación',
+                'nav.history': 'Historial',
+                'nav.reports': 'Informes',
+                'nav.alerts': 'Alertas',
+                'ranking.title': '🏆 Clasificación Mundial',
+                'ranking.subtitle': 'Países con la mejor calidad de internet',
+                'ranking.your_position': 'Tu posición',
+                'ranking.all': 'Todos',
+                'ranking.africa': 'África',
+                'ranking.europe': 'Europa',
+                'ranking.asia': 'Asia',
+                'ranking.top_20': 'Top 20 Mundial',
+                'ranking.rank': 'Rango',
+                'ranking.country': 'País',
+                'ranking.speed': 'Velocidad',
+                'ranking.quality': 'Calidad',
+                'ranking.trend': 'Tendencia',
+                'ranking.top_10_chart': 'Top 10 Mundial',
+                'ranking.by_continent': 'Clasificación por Continente',
+                'ranking.americas': 'Américas',
+                'ranking.oceania': 'Oceanía',
+                'ranking.avg_speed': 'Velocidad prom.',
+                'quality.excellent': 'Excelente',
+                'quality.good': 'Bueno',
+                'quality.medium': 'Medio',
+                'quality.slow': 'Lento',
+                'footer.terms': 'Términos',
+                'footer.privacy': 'Privacidad',
+                'footer.contact': 'Contacto',
+                'footer.copyright': '© 2024 WaveCheck. Todos los derechos reservados.'
+            }
+        };
+
+        // Données complètes de classement mondial (Top 20 + Africains)
+        const rankingData = [
+            { rank: 1, country: 'Corée du Sud', flag: '🇰🇷', speed: 150, quality: 'excellent', continent: 'asia', trend: 'up' },
+            { rank: 2, country: 'Singapour', flag: '🇸🇬', speed: 130, quality: 'excellent', continent: 'asia', trend: 'up' },
+            { rank: 3, country: 'Hong Kong', flag: '🇭🇰', speed: 120, quality: 'excellent', continent: 'asia', trend: 'stable' },
+            { rank: 4, country: 'Suisse', flag: '🇨🇭', speed: 115, quality: 'excellent', continent: 'europe', trend: 'up' },
+            { rank: 5, country: 'Danemark', flag: '🇩🇰', speed: 110, quality: 'excellent', continent: 'europe', trend: 'up' },
+            { rank: 6, country: 'Suède', flag: '🇸🇪', speed: 105, quality: 'excellent', continent: 'europe', trend: 'stable' },
+            { rank: 7, country: 'Norvège', flag: '🇳🇴', speed: 100, quality: 'excellent', continent: 'europe', trend: 'up' },
+            { rank: 8, country: 'France', flag: '🇫🇷', speed: 95, quality: 'excellent', continent: 'europe', trend: 'stable' },
+            { rank: 9, country: 'Japon', flag: '🇯🇵', speed: 90, quality: 'excellent', continent: 'asia', trend: 'up' },
+            { rank: 10, country: 'Pays-Bas', flag: '🇳🇱', speed: 88, quality: 'excellent', continent: 'europe', trend: 'down' },
+            { rank: 11, country: 'Allemagne', flag: '🇩🇪', speed: 85, quality: 'excellent', continent: 'europe', trend: 'stable' },
+            { rank: 12, country: 'España', flag: '🇪🇸', speed: 80, quality: 'excellent', continent: 'europe', trend: 'up' },
+            { rank: 13, country: 'Canada', flag: '🇨🇦', speed: 78, quality: 'excellent', continent: 'americas', trend: 'stable' },
+            { rank: 14, country: 'Taipei', flag: '🇹🇼', speed: 75, quality: 'excellent', continent: 'asia', trend: 'up' },
+            { rank: 15, country: 'États-Unis', flag: '🇺🇸', speed: 72, quality: 'excellent', continent: 'americas', trend: 'stable' },
+            { rank: 16, country: 'Australie', flag: '🇦🇺', speed: 70, quality: 'excellent', continent: 'oceania', trend: 'down' },
+            { rank: 17, country: 'Nouvelle-Zélande', flag: '🇳🇿', speed: 65, quality: 'good', continent: 'oceania', trend: 'up' },
+            { rank: 18, country: 'Afrique du Sud', flag: '🇿🇦', speed: 25, quality: 'good', continent: 'africa', trend: 'stable' },
+            { rank: 19, country: 'Nigeria', flag: '🇳🇬', speed: 20, quality: 'medium', continent: 'africa', trend: 'down' },
+            { rank: 20, country: 'Bénin', flag: '🇧🇯', speed: 15, quality: 'medium', continent: 'africa', trend: 'up' },
+            { rank: 21, country: 'Sénégal', flag: '🇸🇳', speed: 12, quality: 'medium', continent: 'africa', trend: 'stable' }
+        ];
+
+        // ================== INITIALISATION ==================
+        document.documentElement.lang = currentLanguage;
+        if (isDarkMode) document.body.classList.add('dark-mode');
+
+        // Appliquer les traductions
+        function translatePage() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLanguage]?.[key]) {
+                    el.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        // Sélecteur de langue
+        document.getElementById('langSelect').value = currentLanguage;
+        document.getElementById('langSelect').addEventListener('change', (e) => {
+            const lang = e.target.value;
+            localStorage.setItem('language', lang);
+            window.location.reload();
+        });
+
+        // Sélecteur de thème
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+        themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+
+        // ================== DÉTECTION DE LOCALISATION ==================
+        async function detectUserLocation() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch('https://ipapi.co/json/', {
+                    signal: controller.signal,
+                    crossOrigin: true
+                });
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) throw new Error('API error');
+                const data = await response.json();
+                
+                const countryCode = data.country_code || 'UNKNOWN';
+                const countryName = data.country_name || 'Inconnu';
+                
+                // Trouver le classement de l'utilisateur
+                const userCountry = rankingData.find(c => c.country.toUpperCase().includes(countryName.toUpperCase()));
+                
+                if (userCountry) {
+                    document.getElementById('userRank').textContent = `#${userCountry.rank}`;
+                    document.getElementById('userCountry').textContent = `${userCountry.flag} ${userCountry.country}`;
+                    document.getElementById('userSpeed').textContent = `${userCountry.speed} Mbps - ${translations[currentLanguage][`quality.${userCountry.quality}`] || userCountry.quality}`;
+                } else {
+                    // Pays non dans le classement
+                    document.getElementById('userRank').textContent = `> 21`;
+                    document.getElementById('userCountry').textContent = countryName;
+                    document.getElementById('userSpeed').textContent = 'Non classé';
+                }
+            } catch (error) {
+                document.getElementById('userRank').textContent = '—';
+                document.getElementById('userCountry').textContent = 'Localisation indisponible';
+                document.getElementById('userSpeed').textContent = '—';
+            }
+        }
+
+        // ================== FONCTION DE RENDU DU TABLEAU ==================
+        function renderRankingTable(filter = 'all') {
+            let filteredData = rankingData.slice(0, 20); // Top 20 seulement
+
+            if (filter !== 'all') {
+                filteredData = filteredData.filter(item => item.continent === filter);
+            }
+
+            const tbody = document.getElementById('rankingTableBody');
+            tbody.innerHTML = filteredData.map(item => {
+                const qualityClass = `quality-${item.quality}`;
+                const trendIcon = item.trend === 'up' ? '📈' : item.trend === 'down' ? '📉' : '➡️';
+                
+                return `
+                    <tr>
+                        <td>
+                            <span class="rank-medal">
+                                ${item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : `${item.rank}.`}
+                            </span>
+                        </td>
+                        <td>${item.flag} ${item.country}</td>
+                        <td>${item.speed} Mbps</td>
+                        <td><span class="quality-badge ${qualityClass}">${translations[currentLanguage][`quality.${item.quality}`] || item.quality}</span></td>
+                        <td><span class="trend ${item.trend}">${trendIcon}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ================== FILTRAGE ==================
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderRankingTable(currentFilter);
+                updateChart();
+            });
+        });
+
+        // ================== CHART.JS ==================
+        function initializeChart() {
+            const top10 = rankingData.slice(0, 10);
+            const ctx = document.getElementById('rankingChart');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            const labels = top10.map(item => `${item.flag} ${item.country}`);
+            const data = top10.map(item => item.speed);
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Mbps',
+                        data: data,
+                        backgroundColor: '#1A73E8',
+                        borderRadius: 4,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 160,
+                            ticks: {
+                                color: document.body.classList.contains('dark-mode') ? '#CBD5E1' : '#6B7280'
+                            },
+                            grid: {
+                                color: document.body.classList.contains('dark-mode') ? '#334155' : '#E5E7EB'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: document.body.classList.contains('dark-mode') ? '#CBD5E1' : '#6B7280'
+                            },
+                            grid: {
+                                color: document.body.classList.contains('dark-mode') ? '#334155' : '#E5E7EB',
+                                drawBorder: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            initializeChart();
+        }
+
+        // Initialisation au chargement
+        translatePage();
+        renderRankingTable(currentFilter);
+        initializeChart();
+        detectUserLocation();
+    </script>
+</body>
+</html>
+

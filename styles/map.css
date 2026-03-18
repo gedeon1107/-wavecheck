@@ -1,0 +1,21 @@
+.map {
+  height: 420px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Harmonisation Leaflet avec thème sombre */
+.leaflet-control-zoom a {
+  background: rgba(11, 18, 32, 0.85) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+.leaflet-control-attribution {
+  background: rgba(11, 18, 32, 0.65) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.leaflet-container { background: rgba(0, 0, 0, 0.25); }
+

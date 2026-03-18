@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "Home",
+    "test": "Test",
+    "ranking": "Ranking",
+    "history": "History",
+    "reports": "Reports",
+    "alerts": "Alerts"
+  },
+  "home": {
+    "title": "Global Internet quality test",
+    "subtitle": "See your position on the map and run a test in one click.",
+    "cta": "Start a test",
+    "recenter": "Recenter map",
+    "mapTitle": "World map",
+    "quickStats": "Overview",
+    "yourIp": "Your IP",
+    "country": "Country",
+    "city": "City",
+    "howItWorks": "How it works",
+    "step1": "Detect your location (ip-api.com)",
+    "step2": "Speed test (LibreSpeed)",
+    "step3": "Charts & history (Chart.js + optional Firebase)"
+  },
+  "test": {
+    "title": "Connection tester",
+    "subtitle": "Run a speed test via LibreSpeed (public or self-hosted server).",
+    "controls": "Controls",
+    "start": "Start",
+    "save": "Save",
+    "ping": "Ping",
+    "download": "Download",
+    "upload": "Upload",
+    "badge": "Badge",
+    "hint": "Tip: use a local server (http://localhost) to avoid “file://” limitations.",
+    "widgetTitle": "LibreSpeed widget",
+    "widgetNote": "If this public server is down, configure a LibreSpeed endpoint in `scripts/speedtest.js`.",
+    "lastResult": "Last result"
+  },
+  "ranking": {
+    "title": "Global ranking",
+    "subtitle": "Example table (real data can come from Firebase).",
+    "tableTitle": "Top countries",
+    "chartTitle": "Trend",
+    "country": "Country",
+    "avgDown": "Avg download",
+    "avgUp": "Avg upload"
+  },
+  "history": {
+    "title": "Test history",
+    "subtitle": "Results saved locally (and/or to Firebase if configured).",
+    "tableTitle": "Your latest tests",
+    "clear": "Clear",
+    "date": "Date",
+    "location": "Location",
+    "ping": "Ping",
+    "down": "Down",
+    "up": "Up",
+    "badge": "Badge",
+    "empty": "No tests yet."
+  },
+  "reports": {
+    "title": "Monthly reports",
+    "subtitle": "Report template based on your tests (local/Firebase).",
+    "summary": "Summary",
+    "testsCount": "Tests this month",
+    "avgDown": "Avg download",
+    "avgUp": "Avg upload",
+    "chartTitle": "Evolution"
+  },
+  "alerts": {
+    "title": "Network alerts",
+    "subtitle": "Monitors variations (e.g. high ping) based on recent tests.",
+    "rules": "Rules",
+    "pingThreshold": "Ping threshold",
+    "check": "Check",
+    "results": "Results",
+    "noData": "No data.",
+    "highPing": "High ping detected",
+    "ok": "No alert"
+  },
+  "errors": {
+    "locationFailed": "Location unavailable",
+    "testFailed": "Test failed"
+  },
+  "footer": {
+    "free": "100% free — optional cloud storage"
+  }
+}
+

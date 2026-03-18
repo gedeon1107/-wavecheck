@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "test": "Prueba",
+    "ranking": "Ranking",
+    "history": "Historial",
+    "reports": "Informes",
+    "alerts": "Alertas"
+  },
+  "home": {
+    "title": "Prueba global de calidad de Internet",
+    "subtitle": "Mira tu posición en el mapa y ejecuta una prueba en un clic.",
+    "cta": "Iniciar prueba",
+    "recenter": "Recentrar mapa",
+    "mapTitle": "Mapa mundial",
+    "quickStats": "Resumen",
+    "yourIp": "Tu IP",
+    "country": "País",
+    "city": "Ciudad",
+    "howItWorks": "Cómo funciona",
+    "step1": "Detecta tu ubicación (ip-api.com)",
+    "step2": "Prueba de velocidad (LibreSpeed)",
+    "step3": "Gráficas e historial (Chart.js + Firebase opcional)"
+  },
+  "test": {
+    "title": "Probador de conexión",
+    "subtitle": "Ejecuta una prueba de velocidad vía LibreSpeed (servidor público o autoalojado).",
+    "controls": "Controles",
+    "start": "Iniciar",
+    "save": "Guardar",
+    "ping": "Ping",
+    "download": "Descarga",
+    "upload": "Subida",
+    "badge": "Insignia",
+    "hint": "Consejo: usa un servidor local (http://localhost) para evitar limitaciones de “file://”.",
+    "widgetTitle": "Widget de LibreSpeed",
+    "widgetNote": "Si este servidor público no funciona, configura un endpoint de LibreSpeed en `scripts/speedtest.js`.",
+    "lastResult": "Último resultado"
+  },
+  "ranking": {
+    "title": "Ranking global",
+    "subtitle": "Tabla de ejemplo (los datos reales pueden venir de Firebase).",
+    "tableTitle": "Top países",
+    "chartTitle": "Tendencia",
+    "country": "País",
+    "avgDown": "Descarga media",
+    "avgUp": "Subida media"
+  },
+  "history": {
+    "title": "Historial de pruebas",
+    "subtitle": "Resultados guardados localmente (y/o en Firebase si está configurado).",
+    "tableTitle": "Tus últimas pruebas",
+    "clear": "Borrar",
+    "date": "Fecha",
+    "location": "Lugar",
+    "ping": "Ping",
+    "down": "Bajada",
+    "up": "Subida",
+    "badge": "Insignia",
+    "empty": "Aún no hay pruebas."
+  },
+  "reports": {
+    "title": "Informes mensuales",
+    "subtitle": "Plantilla de informe basada en tus pruebas (local/Firebase).",
+    "summary": "Resumen",
+    "testsCount": "Pruebas este mes",
+    "avgDown": "Descarga media",
+    "avgUp": "Subida media",
+    "chartTitle": "Evolución"
+  },
+  "alerts": {
+    "title": "Alertas de red",
+    "subtitle": "Monitorea variaciones (p. ej. ping alto) según pruebas recientes.",
+    "rules": "Reglas",
+    "pingThreshold": "Umbral de ping",
+    "check": "Comprobar",
+    "results": "Resultados",
+    "noData": "Sin datos.",
+    "highPing": "Ping alto detectado",
+    "ok": "Sin alerta"
+  },
+  "errors": {
+    "locationFailed": "Ubicación no disponible",
+    "testFailed": "La prueba falló"
+  },
+  "footer": {
+    "free": "100% gratis — almacenamiento en la nube opcional"
+  }
+}
+

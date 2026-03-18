@@ -1,0 +1,15 @@
+@media (max-width: 920px) {
+  .topbar { flex-wrap: wrap; gap: 10px; }
+  .brand { min-width: auto; }
+  .nav { justify-content: flex-start; }
+  .grid.two { grid-template-columns: 1fr; }
+  .h1 { font-size: 26px; }
+  .map { height: 360px; }
+}
+
+@media (max-width: 520px) {
+  .nav-link { padding: 8px 8px; }
+  .widget { height: 420px; }
+  .input { width: 90px; }
+}
+

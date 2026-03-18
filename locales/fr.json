@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "test": "Test",
+    "ranking": "Classement",
+    "history": "Historique",
+    "reports": "Rapports",
+    "alerts": "Alertes"
+  },
+  "home": {
+    "title": "Test mondial de qualité Internet",
+    "subtitle": "Visualisez votre position sur la carte et lancez un test en un clic.",
+    "cta": "Démarrer un test",
+    "recenter": "Recentrer la carte",
+    "mapTitle": "Carte mondiale",
+    "quickStats": "Aperçu",
+    "yourIp": "Votre IP",
+    "country": "Pays",
+    "city": "Ville",
+    "howItWorks": "Comment ça marche",
+    "step1": "Détection de votre localisation (ip-api.com)",
+    "step2": "Test de débit (LibreSpeed)",
+    "step3": "Graphiques & historique (Chart.js + Firebase optionnel)"
+  },
+  "test": {
+    "title": "Testeur de connexion",
+    "subtitle": "Lancez un test de débit via LibreSpeed (serveur public ou auto-hébergé).",
+    "controls": "Contrôles",
+    "start": "Démarrer",
+    "save": "Enregistrer",
+    "ping": "Ping",
+    "download": "Download",
+    "upload": "Upload",
+    "badge": "Badge",
+    "hint": "Astuce: utilisez un serveur local (http://localhost) pour éviter les limitations liées au “file://”.",
+    "widgetTitle": "Widget LibreSpeed",
+    "widgetNote": "Si ce serveur public est indisponible, configurez un endpoint LibreSpeed dans `scripts/speedtest.js`.",
+    "lastResult": "Dernier résultat"
+  },
+  "ranking": {
+    "title": "Classement mondial",
+    "subtitle": "Exemple de tableau (les données réelles peuvent venir de Firebase).",
+    "tableTitle": "Top pays",
+    "chartTitle": "Tendance",
+    "country": "Pays",
+    "avgDown": "Download moyen",
+    "avgUp": "Upload moyen"
+  },
+  "history": {
+    "title": "Historique des tests",
+    "subtitle": "Résultats enregistrés localement (et/ou dans Firebase si configuré).",
+    "tableTitle": "Vos derniers tests",
+    "clear": "Effacer",
+    "date": "Date",
+    "location": "Lieu",
+    "ping": "Ping",
+    "down": "Down",
+    "up": "Up",
+    "badge": "Badge",
+    "empty": "Aucun test pour le moment."
+  },
+  "reports": {
+    "title": "Rapports mensuels",
+    "subtitle": "Modèle de rapport basé sur vos tests (local/Firebase).",
+    "summary": "Résumé",
+    "testsCount": "Tests ce mois",
+    "avgDown": "Download moyen",
+    "avgUp": "Upload moyen",
+    "chartTitle": "Évolution"
+  },
+  "alerts": {
+    "title": "Alertes réseau",
+    "subtitle": "Surveille les variations (ex: ping élevé) sur la base des derniers tests.",
+    "rules": "Règles",
+    "pingThreshold": "Seuil ping",
+    "check": "Vérifier",
+    "results": "Résultats",
+    "noData": "Aucune donnée.",
+    "highPing": "Ping élevé détecté",
+    "ok": "Pas d'alerte"
+  },
+  "errors": {
+    "locationFailed": "Localisation indisponible",
+    "testFailed": "Test échoué"
+  },
+  "footer": {
+    "free": "100% gratuit — données cloud optionnelles"
+  }
+}
+

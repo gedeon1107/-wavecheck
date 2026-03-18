@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports - WaveCheck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blue-primary: #1A73E8;
+            --blue-light: #E8F0FE;
+            --blue-dark: #1565C0;
+            --green-excellent: #34A853;
+            --blue-good: #4285F4;
+            --orange-medium: #FBBC04;
+            --red-slow: #EA4335;
+            --green-african: #00C853;
+            --gray-no-data: #9CA3AF;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.5;
+        }
+
+        body.dark-mode {
+            background-color: #0F172A;
+            color: #F1F5F9;
+        }
+
+        body.dark-mode .header {
+            background-color: #1E293B;
+            border-bottom-color: #334155;
+        }
+
+        body.dark-mode .card {
+            background-color: #1E293B;
+            border-color: #334155;
+        }
+
+        body.dark-mode .nav-link {
+            color: #CBD5E1;
+        }
+
+        body.dark-mode .nav-link:hover {
+            color: var(--blue-primary);
+        }
+
+        body.dark-mode input,
+        body.dark-mode select {
+            background-color: #334155;
+            color: #F1F5F9;
+            border-color: #475569;
+        }
+
+        /* Header */
+        .header {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--blue-primary);
+            font-weight: 700;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        .logo-section span {
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .logo-text small {
+            font-size: 0.625rem;
+            font-weight: 400;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            flex: 1;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #6B7280;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .nav-link:hover {
+            color: var(--blue-primary);
+            background-color: var(--blue-light);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        select:hover, input:hover {
+            border-color: var(--blue-primary);
+        }
+
+        button.theme-toggle {
+            background: none;
+            border: 1px solid #D1D5DB;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        button.theme-toggle:hover {
+            background-color: #F3F4F6;
+            border-color: var(--blue-primary);
+        }
+
+        body.dark-mode button.theme-toggle:hover {
+            background-color: #334155;
+        }
+
+        /* Main container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Card styles */
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin: 0 0 1rem 0;
+        }
+
+        body.dark-mode .card h2 {
+            color: #F1F5F9;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 0.5rem;
+        }
+
+        body.dark-mode .hero h1 {
+            color: #F1F5F9;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: #6B7280;
+        }
+
+        body.dark-mode .hero p {
+            color: #CBD5E1;
+        }
+
+        /* Sélecteur de période */
+        .period-selector {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 1.5rem;
+        }
+
+        .period-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .period-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6B7280;
+            text-transform: uppercase;
+        }
+
+        body.dark-mode .period-group label {
+            color: #CBD5E1;
+        }
+
+        .period-group select {
+            min-width: 150px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 1px solid #D1D5DB;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--blue-primary);
+            color: var(--blue-primary);
+        }
+
+        .btn.primary {
+            background-color: var(--blue-primary);
+            color: #FFFFFF;
+            border-color: var(--blue-primary);
+        }
+
+        .btn.primary:hover {
+            background-color: var(--blue-dark);
+            border-color: var(--blue-dark);
+        }
+
+        /* Résumé du mois */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--blue-light) 0%, #E0EAFF 100%);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid #D1D5DB;
+        }
+
+        body.dark-mode .summary-card {
+            background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+            border-color: #334155;
+        }
+
+        .summary-emoji {
+            font-size: 2rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-label {
+            font-size: 0.875rem;
+            color: #6B7280;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        body.dark-mode .summary-label {
+            color: #CBD5E1;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--blue-primary);
+        }
+
+        .summary-unit {
+            font-size: 0.875rem;
+            color: #6B7280;
+            margin-top: 0.25rem;
+        }
+
+        body.dark-mode .summary-unit {
+            color: #CBD5E1;
+        }
+
+        .trend {
+            display: inline-block;
+            margin-top: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .trend.positive {
+            background-color: rgba(52, 168, 83, 0.1);
+            color: #34A853;
+        }
+
+        .trend.negative {
+            background-color: rgba(234, 67, 53, 0.1);
+            color: #EA4335;
+        }
+
+        /* Charts container */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin: 1.5rem 0;
+        }
+
+        .chart-container-small {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        /* Table détaillée */
+        .detailed-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .detailed-table thead {
+            background-color: #F9FAFB;
+        }
+
+        body.dark-mode .detailed-table thead {
+            background-color: #1E293B;
+        }
+
+        .detailed-table th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #6B7280;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        body.dark-mode .detailed-table th {
+            color: #CBD5E1;
+            border-bottom-color: #334155;
+        }
+
+        .detailed-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 0.875rem;
+            color: #1F2937;
+        }
+
+        body.dark-mode .detailed-table td {
+            color: #F1F5F9;
+            border-bottom-color: #334155;
+        }
+
+        .detailed-table tr:hover {
+            background-color: #F3F4F6;
+        }
+
+        body.dark-mode .detailed-table tr:hover {
+            background-color: #334155;
+        }
+
+        .quality-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .quality-excellent {
+            background-color: rgba(52, 168, 83, 0.1);
+            color: #34A853;
+        }
+
+        .quality-good {
+            background-color: rgba(66, 133, 244, 0.1);
+            color: #4285F4;
+        }
+
+        .quality-medium {
+            background-color: rgba(251, 188, 4, 0.1);
+            color: #FBBC04;
+        }
+
+        .quality-slow {
+            background-color: rgba(234, 67, 53, 0.1);
+            color: #EA4335;
+        }
+
+        /* Rapport personnel */
+        .personal-report {
+            background: linear-gradient(135deg, var(--blue-light) 0%, #E8F0FE 100%);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            border: 2px solid var(--blue-primary);
+        }
+
+        body.dark-mode .personal-report {
+            background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+            border-color: var(--blue-primary);
+        }
+
+        .personal-report h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--blue-primary);
+            margin-bottom: 1rem;
+        }
+
+        .personal-report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .personal-stat {
+            background-color: #FFFFFF;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border-left: 4px solid var(--blue-primary);
+        }
+
+        body.dark-mode .personal-stat {
+            background-color: #334155;
+        }
+
+        .personal-stat-label {
+            font-size: 0.875rem;
+            color: #6B7280;
+            margin-bottom: 0.5rem;
+        }
+
+        body.dark-mode .personal-stat-label {
+            color: #CBD5E1;
+        }
+
+        .personal-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--blue-primary);
+        }
+
+        .personal-advice {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--blue-primary);
+        }
+
+        body.dark-mode .personal-advice {
+            background-color: rgba(26, 115, 232, 0.1);
+        }
+
+        .personal-advice-title {
+            font-weight: 600;
+            color: var(--blue-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .personal-advice-text {
+            color: #1F2937;
+            font-size: 0.95rem;
+        }
+
+        body.dark-mode .personal-advice-text {
+            color: #CBD5E1;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #F9FAFB;
+            border-top: 1px solid #E5E7EB;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 0.875rem;
+            color: #9CA3AF;
+        }
+
+        body.dark-mode footer {
+            background-color: #1E293B;
+            border-top-color: #334155;
+            color: #64748B;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #6B7280;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        body.dark-mode .footer-links a {
+            color: #CBD5E1;
+        }
+
+        .footer-links a:hover {
+            color: var(--blue-primary);
+        }
+
+        .footer-copyright {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5E7EB;
+            color: #9CA3AF;
+            font-size: 0.75rem;
+        }
+
+        body.dark-mode .footer-copyright {
+            border-top-color: #334155;
+            color: #64748B;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                gap: 1rem;
+                justify-content: flex-start;
+                order: 3;
+                width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .period-selector {
+                flex-direction: column;
+            }
+
+            .period-group select {
+                min-width: 100%;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .chart-container-small {
+                height: 200px;
+            }
+
+            .detailed-table {
+                font-size: 0.75rem;
+            }
+
+            .detailed-table th,
+            .detailed-table td {
+                padding: 0.5rem;
+            }
+
+            .personal-report-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Styles d'impression pour PDF */
+        @media print {
+            .header, .period-selector, .btn {
+                display: none !important;
+            }
+
+            body {
+                background-color: #FFFFFF;
+                color: #000000;
+            }
+
+            main {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .card {
+                page-break-inside: avoid;
+                background-color: #FFFFFF;
+                border-color: #000000;
+            }
+
+            .chart-container {
+                page-break-inside: avoid;
+            }
+
+            footer {
+                display: none;
+            }
+
+            .hero {
+                text-align: center;
+                margin-bottom: 2rem;
+                border-bottom: 2px solid #000000;
+                padding-bottom: 2rem;
+            }
+
+            .summary-card {
+                background: #FFFFFF;
+                border: 1px solid #000000;
+            }
+
+            .detailed-table {
+                border: 1px solid #000000;
+            }
+
+            .detailed-table th {
+                background-color: #F0F0F0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête avec navigation -->
+    <header class="header">
+        <div class="header-container">
+            <!-- Logo -->
+            <a href="./index.html" class="logo-section">
+                <span>📡</span>
+                <div class="logo-text">
+                    <strong>WaveCheck</strong>
+                    <small>Analyse de connexion</small>
+                </div>
+            </a>
+
+            <!-- Navigation -->
+            <nav>
+                <a href="./index.html" class="nav-link">Accueil</a>
+                <a href="./test.html" class="nav-link">Test</a>
+                <a href="./ranking.html" class="nav-link">Classement</a>
+                <a href="./history.html" class="nav-link">Historique</a>
+                <a href="./reports.html" class="nav-link">Rapports</a>
+                <a href="./alerts.html" class="nav-link">Alertes</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="header-actions">
+                <select id="langSelect">
+                    <option value="fr">FR</option>
+                    <option value="en">EN</option>
+                    <option value="es">ES</option>
+                </select>
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        <!-- Hero section -->
+        <section class="hero">
+            <h1>📈 Rapports Mensuels</h1>
+            <p>Analyse détaillée de la qualité internet par pays et par mois</p>
+        </section>
+
+        <!-- Sélecteur de période -->
+        <section class="card">
+            <div class="period-selector">
+                <div class="period-group">
+                    <label for="monthSelect">Mois</label>
+                    <select id="monthSelect">
+                        <option value="0">Janvier</option>
+                        <option value="1">Février</option>
+                        <option value="2">Mars</option>
+                        <option value="3">Avril</option>
+                        <option value="4">Mai</option>
+                        <option value="5">Juin</option>
+                        <option value="6">Juillet</option>
+                        <option value="7">Août</option>
+                        <option value="8">Septembre</option>
+                        <option value="9">Octobre</option>
+                        <option value="10">Novembre</option>
+                        <option value="11">Décembre</option>
+                    </select>
+                </div>
+                <div class="period-group">
+                    <label for="yearSelect">Année</label>
+                    <select id="yearSelect">
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026" selected>2026</option>
+                    </select>
+                </div>
+                <button class="btn primary" id="generateBtn">Générer le rapport</button>
+                <button class="btn" id="printBtn" onclick="window.print()">📥 Télécharger PDF</button>
+            </div>
+        </section>
+
+        <!-- Résumé du mois -->
+        <section class="card">
+            <h2>Résumé du mois</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-emoji">⚡</div>
+                    <div class="summary-label">Vitesse moyenne mondiale</div>
+                    <div class="summary-value"><span id="globalAvgSpeed">0</span><span class="summary-unit">Mbps</span></div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-emoji">🚀</div>
+                    <div class="summary-label">Pays le plus rapide</div>
+                    <div class="summary-value"><span id="fastestCountry">—</span></div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-emoji">🐌</div>
+                    <div class="summary-label">Pays le plus lent</div>
+                    <div class="summary-value"><span id="slowestCountry">—</span></div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-emoji">🔢</div>
+                    <div class="summary-label">Total de tests ce mois</div>
+                    <div class="summary-value"><span id="totalTests">0</span></div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-emoji">📊</div>
+                    <div class="summary-label">Amélioration vs mois préc.</div>
+                    <div class="summary-value"><span id="monthImprovement" class="trend">+0%</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Graphique 1 - Évolution mensuelle -->
+        <section class="card">
+            <h2>Évolution mensuelle mondiale</h2>
+            <div class="chart-container">
+                <canvas id="evolutionChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Graphique 2 - Top pays du mois -->
+        <section class="card">
+            <h2>Top 10 pays ce mois</h2>
+            <div class="chart-container">
+                <canvas id="topCountriesChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Graphique 3 - Afrique ce mois -->
+        <section class="card">
+            <h2>Vitesses en Afrique ce mois</h2>
+            <div class="chart-container-small">
+                <canvas id="africaChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Tableau détaillé -->
+        <section class="card">
+            <h2>Détails par pays</h2>
+            <div style="overflow-x: auto;">
+                <table class="detailed-table">
+                    <thead>
+                        <tr>
+                            <th>Pays</th>
+                            <th>Vitesse moy.</th>
+                            <th>Meilleur</th>
+                            <th>Pire</th>
+                            <th>Tests</th>
+                            <th>Évolution</th>
+                            <th>Qualité</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailedTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Rapport personnel -->
+        <section class="personal-report">
+            <h3>👤 Votre mois</h3>
+            <div class="personal-report-grid">
+                <div class="personal-stat">
+                    <div class="personal-stat-label">Vos tests ce mois</div>
+                    <div class="personal-stat-value" id="personalTests">0</div>
+                </div>
+                <div class="personal-stat">
+                    <div class="personal-stat-label">Votre vitesse moyenne</div>
+                    <div class="personal-stat-value" id="personalAvgSpeed">0<span class="summary-unit"> Mbps</span></div>
+                </div>
+                <div class="personal-stat">
+                    <div class="personal-stat-label">Votre meilleur résultat</div>
+                    <div class="personal-stat-value" id="personalBestSpeed">0<span class="summary-unit"> Mbps</span></div>
+                </div>
+                <div class="personal-stat">
+                    <div class="personal-stat-label">Comparaison mondiale</div>
+                    <div class="personal-stat-value" id="personalComparison">—</div>
+                </div>
+            </div>
+            <div class="personal-advice">
+                <div class="personal-advice-title" id="adviceTitle">💡 Conseil personnalisé</div>
+                <div class="personal-advice-text" id="adviceText">Effectuez des tests pour obtenir des analyses personnalisées.</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="footer-links">
+            <a href="#">Conditions</a>
+            <a href="#">Confidentialité</a>
+            <a href="#">Contact</a>
+        </div>
+        <div class="footer-copyright">
+            <p>© 2024 WaveCheck. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ================== CONFIGURATION ==================
+        const currentLanguage = localStorage.getItem('language') || 'fr';
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        // Noms des mois en français
+        const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        
+        let evolutionChart = null;
+        let topCountriesChart = null;
+        let africaChart = null;
+
+        // ================== INITIALISATION ==================
+        document.documentElement.lang = currentLanguage;
+        if (isDarkMode) document.body.classList.add('dark-mode');
+
+        // Sélecteur de langue
+        document.getElementById('langSelect').value = currentLanguage;
+        document.getElementById('langSelect').addEventListener('change', (e) => {
+            const lang = e.target.value;
+            localStorage.setItem('language', lang);
+            window.location.reload();
+        });
+
+        // Sélecteur de thème
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+        themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+
+        // ================== BASE DE DONNÉES DE PAYS ==================
+        // Database avec drapeau et continent pour chaque pays
+        const countryDatabase = [
+            { name: 'Corée du Sud', flag: '🇰🇷', continent: 'Asia', speed: 150, tests: 850 },
+            { name: 'Singapour', flag: '🇸🇬', continent: 'Asia', speed: 130, tests: 720 },
+            { name: 'Hong Kong', flag: '🇭🇰', continent: 'Asia', speed: 120, tests: 680 },
+            { name: 'Japon', flag: '🇯🇵', continent: 'Asia', speed: 115, tests: 900 },
+            { name: 'Suisse', flag: '🇨🇭', continent: 'Europe', speed: 110, tests: 450 },
+            { name: 'Pays-Bas', flag: '🇳🇱', continent: 'Europe', speed: 105, tests: 520 },
+            { name: 'Suède', flag: '🇸🇪', continent: 'Europe', speed: 100, tests: 380 },
+            { name: 'États-Unis', flag: '🇺🇸', continent: 'Americas', speed: 95, tests: 2100 },
+            { name: 'France', flag: '🇫🇷', continent: 'Europe', speed: 85, tests: 1200 },
+            { name: 'Allemagne', flag: '🇩🇪', continent: 'Europe', speed: 82, tests: 850 },
+            { name: 'Espagne', flag: '🇪🇸', continent: 'Europe', speed: 78, tests: 620 },
+            { name: 'Belgique', flag: '🇧🇪', continent: 'Europe', speed: 75, tests: 380 },
+            { name: 'Canada', flag: '🇨🇦', continent: 'Americas', speed: 72, tests: 890 },
+            { name: 'Brésil', flag: '🇧🇷', continent: 'Americas', speed: 65, tests: 1450 },
+            { name: 'Mexique', flag: '🇲🇽', continent: 'Americas', speed: 58, tests: 780 },
+            { name: 'Afrique du Sud', flag: '🇿🇦', continent: 'Africa', speed: 25, tests: 420 },
+            { name: 'Nigeria', flag: '🇳🇬', continent: 'Africa', speed: 20, tests: 380 },
+            { name: 'Bénin', flag: '🇧🇯', continent: 'Africa', speed: 15, tests: 210 },
+            { name: 'Sénégal', flag: '🇸🇳', continent: 'Africa', speed: 12, tests: 180 },
+            { name: 'Maroc', flag: '🇲🇦', continent: 'Africa', speed: 22, tests: 350 },
+        ];
+
+        // ================== GÉNÉRATION DE DONNÉES RÉALISTES ==================
+        // Génère les données pour le mois et l'année sélectionnés
+        function getMonthData(month, year) {
+            // Variation saisonnière (plus de variation en hiver)
+            const seasonalVariation = 1 + (Math.sin(month / 6) * 0.1);
+            
+            const countries = countryDatabase.map(country => {
+                const baseSpeed = country.speed * seasonalVariation;
+                const variance = baseSpeed * 0.15;
+                const avgSpeed = baseSpeed + (Math.random() - 0.5) * variance;
+                const testsCount = country.tests + Math.floor((Math.random() - 0.5) * 100);
+                
+                return {
+                    ...country,
+                    avgSpeed: Math.max(1, avgSpeed),
+                    bestSpeed: Math.min(avgSpeed * 1.3, baseSpeed * 1.5),
+                    worstSpeed: Math.max(1, avgSpeed * 0.5),
+                    testsCount: Math.max(10, testsCount),
+                    improvement: (Math.random() - 0.5) * 20
+                };
+            });
+
+            return countries;
+        }
+
+        // ================== CALCUL DES STATISTIQUES ==================
+        // Calcule les statistiques globales du mois
+        function calculateMonthStats(monthData) {
+            const globalAvg = monthData.reduce((sum, c) => sum + c.avgSpeed, 0) / monthData.length;
+            const fastest = monthData.reduce((max, c) => c.avgSpeed > max.avgSpeed ? c : max);
+            const slowest = monthData.reduce((min, c) => c.avgSpeed < min.avgSpeed ? c : min);
+            const totalTests = monthData.reduce((sum, c) => sum + c.testsCount, 0);
+            const prevMonthAvg = globalAvg * (0.95 + Math.random() * 0.05);
+            const improvement = ((globalAvg - prevMonthAvg) / prevMonthAvg * 100).toFixed(1);
+
+            return { globalAvg, fastest, slowest, totalTests, improvement };
+        }
+
+        // ================== QUALITÉ EN FONCTION DE VITESSE ==================
+        // Détermine le badge de qualité selon la vitesse
+        function getQualityBadge(speed) {
+            if (speed >= 100) return 'excellent';
+            if (speed >= 50) return 'good';
+            if (speed >= 20) return 'medium';
+            return 'slow';
+        }
+
+        // ================== RENDU PRINCIPAL ==================
+        // Génère le rapport complet avec tous les graphiques et données
+        function generateReport() {
+            const month = parseInt(document.getElementById('monthSelect').value);
+            const year = parseInt(document.getElementById('yearSelect').value);
+            
+            const monthData = getMonthData(month, year);
+            const stats = calculateMonthStats(monthData);
+
+            // Mise à jour du résumé du mois
+            document.getElementById('globalAvgSpeed').textContent = stats.globalAvg.toFixed(1);
+            document.getElementById('fastestCountry').textContent = stats.fastest.flag + ' ' + stats.fastest.name;
+            document.getElementById('slowestCountry').textContent = stats.slowest.flag + ' ' + stats.slowest.name;
+            document.getElementById('totalTests').textContent = stats.totalTests.toLocaleString();
+            
+            const trendElement = document.getElementById('monthImprovement');
+            trendElement.textContent = (stats.improvement > 0 ? '+' : '') + stats.improvement + '%';
+            trendElement.className = 'trend ' + (stats.improvement > 0 ? 'positive' : 'negative');
+
+            // Tableau détaillé par pays
+            const tbody = document.getElementById('detailedTableBody');
+            tbody.innerHTML = monthData.map(country => {
+                const quality = getQualityBadge(country.avgSpeed);
+                return `
+                    <tr>
+                        <td>${country.flag} ${country.name}</td>
+                        <td>${country.avgSpeed.toFixed(1)} Mbps</td>
+                        <td>${country.bestSpeed.toFixed(1)} Mbps</td>
+                        <td>${country.worstSpeed.toFixed(1)} Mbps</td>
+                        <td>${country.testsCount}</td>
+                        <td><span class="trend ${country.improvement > 0 ? 'positive' : 'negative'}">${country.improvement > 0 ? '+' : ''}${country.improvement.toFixed(1)}%</span></td>
+                        <td><span class="quality-badge quality-${quality}">${quality.charAt(0).toUpperCase() + quality.slice(1)}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Données personnelles depuis localStorage
+            const personalHistory = JSON.parse(localStorage.getItem('testHistory') || '[]');
+            const personalStats = calculatePersonalStats(personalHistory, month, year);
+            updatePersonalReport(personalStats, stats.globalAvg);
+
+            // Mise à jour des graphiques
+            updateCharts(monthData, stats.globalAvg);
+        }
+
+        // ================== STATISTIQUES PERSONNELLES ==================
+        // Extrait les statistiques personnelles pour le mois et l'année sélectionnés
+        function calculatePersonalStats(history, month, year) {
+            if (history.length === 0) {
+                return { tests: 0, avgSpeed: 0, bestSpeed: 0, comparison: 0 };
+            }
+
+            // Filtre les tests du mois et de l'année sélectionnés
+            const monthTests = history.filter(item => {
+                const date = new Date(item.date);
+                return date.getMonth() === month && date.getFullYear() === year;
+            });
+
+            if (monthTests.length === 0) {
+                return { tests: 0, avgSpeed: 0, bestSpeed: 0, comparison: 0 };
+            }
+
+            const avgSpeed = monthTests.reduce((sum, t) => sum + (t.download || t.speed || 0), 0) / monthTests.length;
+            const bestSpeed = Math.max(...monthTests.map(t => t.download || t.speed || 0));
+
+            return {
+                tests: monthTests.length,
+                avgSpeed: avgSpeed.toFixed(1),
+                bestSpeed: bestSpeed.toFixed(1),
+                comparison: 0
+            };
+        }
+
+        // ================== MISE À JOUR RAPPORT PERSONNEL ==================
+        // Met à jour la section "Votre mois" avec le conseil personnalisé
+        function updatePersonalReport(personalStats, globalAvg) {
+            document.getElementById('personalTests').textContent = personalStats.tests;
+            document.getElementById('personalAvgSpeed').innerHTML = `${personalStats.avgSpeed}<span class="summary-unit"> Mbps</span>`;
+            document.getElementById('personalBestSpeed').innerHTML = `${personalStats.bestSpeed}<span class="summary-unit"> Mbps</span>`;
+
+            if (personalStats.tests === 0) {
+                document.getElementById('personalComparison').textContent = '—';
+                document.getElementById('adviceTitle').textContent = '💡 Conseil personnalisé';
+                document.getElementById('adviceText').textContent = 'Effectuez des tests pour obtenir des analyses personnalisées.';
+            } else {
+                const comparison = ((personalStats.avgSpeed - globalAvg) / globalAvg * 100).toFixed(1);
+                document.getElementById('personalComparison').textContent = (comparison > 0 ? '+' : '') + comparison + '%';
+
+                const quality = getQualityBadge(personalStats.avgSpeed);
+                const advice = getPersonalAdvice(quality);
+                document.getElementById('adviceTitle').textContent = advice.title;
+                document.getElementById('adviceText').textContent = advice.text;
+            }
+        }
+
+        // ================== CONSEIL PERSONNALISÉ SELON QUALITÉ ==================
+        // Génère un conseil adapté en fonction de la qualité de connexion
+        function getPersonalAdvice(quality) {
+            const advices = {
+                excellent: {
+                    title: '🎉 Félicitations ! Connexion optimale',
+                    text: 'Votre connexion est excellente. Vous disposez d\'une bande passante suffisante pour tous les usages (streaming 4K, conférences vidéo, gaming en ligne).'
+                },
+                good: {
+                    title: '👍 Bonne connexion',
+                    text: 'Votre connexion est bonne avec quelques pics de latence mineurs. Idéale pour le travail à distance et le streaming HD.'
+                },
+                medium: {
+                    title: '⚠️ Connexion acceptable mais améliorable',
+                    text: 'Votre connexion convient pour la navigation web et le streaming standard, mais peut avoir des problèmes lors d\'utilisation intensive.'
+                },
+                slow: {
+                    title: '🐌 Connexion lente',
+                    text: 'Votre connexion est lente. Contactez votre opérateur pour vérifier votre offre ou signaler un problème potentiel.'
+                }
+            };
+            return advices[quality] || advices.medium;
+        }
+
+        // ================== GRAPHIQUES CHART.JS ==================
+        // Met à jour tous les graphiques du rapport
+        function updateCharts(monthData, globalAvg) {
+            updateEvolutionChart(globalAvg);
+            updateTopCountriesChart(monthData);
+            updateAfricaChart(monthData);
+        }
+
+        // Graphique 1 : Évolution mensuelle mondiale sur 12 mois
+        function updateEvolutionChart(globalAvg) {
+            const ctx = document.getElementById('evolutionChart');
+            if (evolutionChart) evolutionChart.destroy();
+
+            // Génère les données pour les 12 mois
+            const monthlyData = Array.from({length: 12}, (_, i) => {
+                const variation = (Math.sin(i / 6) * 0.1) + (Math.random() - 0.5) * 0.05;
+                return globalAvg * (1 + variation);
+            });
+
+            evolutionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthNames,
+                    datasets: [{
+                        label: 'Vitesse mondiale moyenne',
+                        data: monthlyData,
+                        borderColor: '#1A73E8',
+                        backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                        tension: 0.4,
+                        borderWidth: 2,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#1A73E8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: isDarkMode ? '#CBD5E1' : '#6B7280' } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: isDarkMode ? '#CBD5E1' : '#6B7280' },
+                            grid: { color: isDarkMode ? '#334155' : '#E5E7EB' }
+                        },
+                        x: {
+                            ticks: { color: isDarkMode ? '#CBD5E1' : '#6B7280' },
+                            grid: { color: isDarkMode ? '#334155' : '#E5E7EB' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Graphique 2 : Top 10 pays du mois (graphique en barres horizontal)
+        function updateTopCountriesChart(monthData) {
+            const ctx = document.getElementById('topCountriesChart');
+            if (topCountriesChart) topCountriesChart.destroy();
+
+            // Sélectionne les 10 pays les plus rapides
+            const top10 = monthData.slice().sort((a, b) => b.avgSpeed - a.avgSpeed).slice(0, 10);
+
+            topCountriesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: top10.map(c => c.flag + ' ' + c.name),
+                    datasets: [{
+                        label: 'Vitesse moyenne (Mbps)',
+                        data: top10.map(c => c.avgSpeed),
+                        backgroundColor: top10.map(c => {
+                            const quality = getQualityBadge(c.avgSpeed);
+                            const colors = {
+                                excellent: '#34A853',
+                                good: '#4285F4',
+                                medium: '#FBBC04',
+                                slow: '#EA4335'
+                            };
+                            return colors[quality];
+                        }),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 160,
+                            ticks: { color: isDarkMode ? '#CBD5E1' : '#6B7280' },
+                            grid: { color: isDarkMode ? '#334155' : '#E5E7EB' }
+                        },
+                        y: {
+                            ticks: { color: isDarkMode ? '#CBD5E1' : '#6B7280' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Graphique 3 : Focus sur les pays africains (graphique en barres)
+        function updateAfricaChart(monthData) {
+            const ctx = document.getElementById('africaChart');
+            if (africaChart) africaChart.destroy();
+
+            // Filtre et trie les pays africains
+            const africaCountries = monthData.filter(c => c.continent === 'Africa').sort((a, b) => b.avgSpeed - a.avgSpeed);
+
+            africaChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: africaCountries.map(c => c.flag + ' ' + c.name),
+                    datasets: [{
+                        label: 'Vitesse (Mbps)',
+                        data: africaCountries.map(c => c.avgSpeed),
+                        backgroundColor: '#00C853',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: isDarkMode ? '#CBD5E1' : '#6B7280' },
+                            grid: { color: isDarkMode ? '#334155' : '#E5E7EB' }
+                        },
+                        x: {
+                            ticks: { color: isDarkMode ? '#CBD5E1' : '#6B7280' },
+                            grid: { color: isDarkMode ? '#334155' : '#E5E7EB' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ================== ÉCOUTEURS D'ÉVÉNEMENTS ==================
+        document.getElementById('generateBtn').addEventListener('click', generateReport);
+
+        // Initialisation au chargement de la page
+        generateReport();
+    </script>
+</body>
+</html>
+

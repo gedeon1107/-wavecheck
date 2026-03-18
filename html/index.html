@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WaveCheck — Test mondial de qualité Internet</title>
+
+    <!-- ==================== CDN ESSENTIELS ==================== -->
+    
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS pour la carte -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Leaflet JS pour la carte -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- ==================== STYLES PERSONNALISÉS ==================== -->
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --blue-primary: #1A73E8;
+            --blue-light: #E8F0FE;
+            --blue-dark: #1565C0;
+            --green-excellent: #34A853;
+            --blue-good: #4285F4;
+            --orange-medium: #FBBC04;
+            --red-slow: #EA4335;
+            --gray-no-data: #9CA3AF;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Mode clair (par défaut) */
+        body {
+            background-color: #FFFFFF;
+            color: #1F2937;
+        }
+
+        /* Mode sombre */
+        body.dark-mode {
+            background-color: #0F172A;
+            color: #F1F5F9;
+        }
+
+        body.dark-mode .header {
+            background-color: #1E293B;
+            border-bottom-color: #334155;
+        }
+
+        body.dark-mode .card {
+            background-color: #1E293B;
+            border-color: #334155;
+        }
+
+        body.dark-mode .nav-link {
+            color: #CBD5E1;
+        }
+
+        body.dark-mode .nav-link:hover {
+            color: var(--blue-primary);
+        }
+
+        body.dark-mode input,
+        body.dark-mode select {
+            background-color: #334155;
+            color: #F1F5F9;
+            border-color: #475569;
+        }
+
+        /* Header */
+        .header {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--blue-primary);
+            font-weight: 700;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        .logo-section span {
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .logo-text small {
+            font-size: 0.625rem;
+            font-weight: 400;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            flex: 1;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #6B7280;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .nav-link:hover {
+            color: var(--blue-primary);
+            background-color: var(--blue-light);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        select:hover, input:hover {
+            border-color: var(--blue-primary);
+        }
+
+        button.theme-toggle {
+            background: none;
+            border: 1px solid #D1D5DB;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        button.theme-toggle:hover {
+            background-color: #F3F4F6;
+            border-color: var(--blue-primary);
+        }
+
+        body.dark-mode button.theme-toggle:hover {
+            background-color: #334155;
+        }
+
+        /* Main container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, var(--blue-light) 0%, transparent 100%);
+        }
+
+        body.dark-mode .hero {
+            background: linear-gradient(135deg, rgba(26, 115, 232, 0.1) 0%, transparent 100%);
+        }
+
+        .hero h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin: 1rem 0;
+            line-height: 1.2;
+        }
+
+        body.dark-mode .hero h1 {
+            color: #F1F5F9;
+        }
+
+        .hero p {
+            font-size: 0.875rem;
+            color: #6B7280;
+            margin: 0.5rem 0 2rem 0;
+        }
+
+        body.dark-mode .hero p {
+            color: #CBD5E1;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #6B7280;
+            margin-bottom: 1rem;
+        }
+
+        body.dark-mode .hero-tag {
+            color: #CBD5E1;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 1px solid #D1D5DB;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--blue-primary);
+            color: var(--blue-primary);
+        }
+
+        .btn.primary {
+            background-color: var(--blue-primary);
+            color: #FFFFFF;
+            border-color: var(--blue-primary);
+        }
+
+        .btn.primary:hover {
+            background-color: var(--blue-dark);
+            border-color: var(--blue-dark);
+        }
+
+        /* Card styles */
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin: 0;
+        }
+
+        body.dark-mode .card h2 {
+            color: #F1F5F9;
+        }
+
+        .card-subtitle {
+            font-size: 0.75rem;
+            color: #9CA3AF;
+            margin-top: 0.25rem;
+        }
+
+        body.dark-mode .card-subtitle {
+            color: #64748B;
+        }
+
+        /* Map */
+        #map {
+            height: 500px;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Location pill */
+        .pill {
+            background-color: var(--blue-light);
+            color: var(--blue-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        body.dark-mode .pill {
+            background-color: rgba(26, 115, 232, 0.2);
+        }
+
+        /* Grid layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                gap: 1rem;
+                justify-content: flex-start;
+                order: 3;
+                width: 100%;
+            }
+
+            .header-actions {
+                order: 2;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            #map {
+                height: 350px;
+            }
+        }
+
+        /* Key-Value display */
+        .kv-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        body.dark-mode .kv-row {
+            border-bottom-color: #334155;
+        }
+
+        .kv-row:last-child {
+            border-bottom: none;
+        }
+
+        .kv-k {
+            font-weight: 600;
+            color: #6B7280;
+            font-size: 0.875rem;
+        }
+
+        body.dark-mode .kv-k {
+            color: #CBD5E1;
+        }
+
+        .kv-v {
+            font-weight: 700;
+            color: #1F2937;
+            font-size: 0.875rem;
+        }
+
+        body.dark-mode .kv-v {
+            color: #F1F5F9;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #F9FAFB;
+            border-top: 1px solid #E5E7EB;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 0.875rem;
+            color: #9CA3AF;
+        }
+
+        body.dark-mode footer {
+            background-color: #1E293B;
+            border-top-color: #334155;
+            color: #64748B;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #6B7280;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        body.dark-mode .footer-links a {
+            color: #CBD5E1;
+        }
+
+        .footer-links a:hover {
+            color: var(--blue-primary);
+        }
+
+        .footer-copyright {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5E7EB;
+            color: #9CA3AF;
+            font-size: 0.75rem;
+        }
+
+        body.dark-mode .footer-copyright {
+            border-top-color: #334155;
+            color: #64748B;
+        }
+
+        /* List styles */
+        ul.list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul.list li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #6B7280;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        body.dark-mode ul.list li {
+            color: #CBD5E1;
+        }
+
+        ul.list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--blue-primary);
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ==================== HEADER ==================== -->
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo-section">
+                <span>🌊</span>
+                <div class="logo-text">
+                    <strong>WaveCheck</strong>
+                    <small data-i18n="tagline">Testez votre réseau</small>
+                </div>
+            </a>
+
+            <nav data-i18n="nav">
+                <a href="#" class="nav-link" data-i18n="nav.home">Accueil</a>
+                <a href="#" class="nav-link" data-i18n="nav.test">Test</a>
+                <a href="#" class="nav-link" data-i18n="nav.ranking">Classement</a>
+                <a href="#" class="nav-link" data-i18n="nav.history">Historique</a>
+                <a href="#" class="nav-link" data-i18n="nav.reports">Rapports</a>
+                <a href="#" class="nav-link" data-i18n="nav.alerts">Alertes</a>
+            </nav>
+
+            <div class="header-actions">
+                <select id="languageSelect" aria-label="Language">
+                    <option value="fr">FR</option>
+                    <option value="en">EN</option>
+                    <option value="es">ES</option>
+                </select>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    🌙
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <p class="hero-tag" data-i18n="hero.tag">🌍 Internet Quality Monitor</p>
+            <h1 data-i18n="hero.title">Test mondial de qualité Internet</h1>
+            <p data-i18n="hero.subtitle">Visualisez la qualité de votre réseau dans votre zone précise et contribuez à une carte mondiale collaborative.</p>
+            
+            <div class="hero-actions">
+                <button class="btn primary" id="startTestBtn" data-i18n="hero.startTest">
+                    Démarrer un test
+                </button>
+                <button class="btn" id="recenterBtn" data-i18n="hero.recenter">
+                    Recentrer sur ma zone
+                </button>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="card">
+            <div class="card-header">
+                <div>
+                    <h2 data-i18n="map.title">Carte mondiale collaborative</h2>
+                    <p class="card-subtitle" data-i18n="map.subtitle">Votre test alimente une carte publique et anonyme de la qualité réseau</p>
+                </div>
+                <div class="pill" id="locationPill" data-i18n="map.detecting">Détection en cours…</div>
+            </div>
+            <div id="map"></div>
+        </section>
+
+        <!-- Network Info and How It Works -->
+        <div class="grid-2">
+            <!-- Network Information -->
+            <section class="card">
+                <h2 data-i18n="info.title">Votre situation réseau</h2>
+                
+                <div class="kv-row">
+                    <div class="kv-k" data-i18n="info.ip">Votre IP</div>
+                    <div class="kv-v" id="ipValue">—</div>
+                </div>
+                
+                <div class="kv-row">
+                    <div class="kv-k" data-i18n="info.country">Pays / Région</div>
+                    <div class="kv-v" id="countryValue">—</div>
+                </div>
+                
+                <div class="kv-row">
+                    <div class="kv-k" data-i18n="info.city">Ville</div>
+                    <div class="kv-v" id="cityValue">—</div>
+                </div>
+                
+                <div class="kv-row">
+                    <div class="kv-k" data-i18n="info.isp">Opérateur</div>
+                    <div class="kv-v" id="ispValue">—</div>
+                </div>
+                
+                <div class="kv-row">
+                    <div class="kv-k" data-i18n="info.network">Type de réseau</div>
+                    <div class="kv-v" id="networkTypeValue">—</div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section class="card">
+                <h2 data-i18n="howitworks.title">Comment ça marche</h2>
+                <ul class="list">
+                    <li data-i18n="howitworks.step1">Détection de votre localisation (ipwho.is)</li>
+                    <li data-i18n="howitworks.step2">Test de débit rapide et précis</li>
+                    <li data-i18n="howitworks.step3">Graphiques, historique et alertes en temps réel</li>
+                </ul>
+            </section>
+        </div>
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer>
+        <div class="footer-links">
+            <a href="#" data-i18n="footer.home">Accueil</a>
+            <a href="#" data-i18n="footer.test">Test</a>
+            <a href="#" data-i18n="footer.ranking">Classement</a>
+        </div>
+        <p data-i18n="footer.free">100% gratuit — données anonymes et publiques</p>
+        <div class="footer-copyright">
+            <span data-i18n="footer.copyright">Copyright © 2025 WaveCheck. Tous droits réservés.</span>
+        </div>
+    </footer>
+
+    <!-- ==================== SCRIPT PRINCIPAL ==================== -->
+    <script>
+        // ===== CONFIGURATION MULTILINGUE =====
+        const translations = {
+            fr: {
+                tagline: "Testez votre réseau",
+                'nav.home': "Accueil",
+                'nav.test': "Test",
+                'nav.ranking': "Classement",
+                'nav.history': "Historique",
+                'nav.reports': "Rapports",
+                'nav.alerts': "Alertes",
+                'hero.tag': "🌍 Internet Quality Monitor",
+                'hero.title': "Test mondial de qualité Internet",
+                'hero.subtitle': "Visualisez la qualité de votre réseau dans votre zone précise et contribuez à une carte mondiale collaborative.",
+                'hero.startTest': "Démarrer un test",
+                'hero.recenter': "Recentrer sur ma zone",
+                'map.title': "Carte mondiale collaborative",
+                'map.subtitle': "Votre test alimente une carte publique et anonyme de la qualité réseau",
+                'map.detecting': "Détection en cours…",
+                'info.title': "Votre situation réseau",
+                'info.ip': "Votre IP",
+                'info.country': "Pays / Région",
+                'info.city': "Ville",
+                'info.isp': "Opérateur",
+                'info.network': "Type de réseau",
+                'howitworks.title': "Comment ça marche",
+                'howitworks.step1': "Détection de votre localisation (ipwho.is)",
+                'howitworks.step2': "Test de débit rapide et précis",
+                'howitworks.step3': "Graphiques, historique et alertes en temps réel",
+                'footer.home': "Accueil",
+                'footer.test': "Test",
+                'footer.ranking': "Classement",
+                'footer.free': "100% gratuit — données anonymes et publiques",
+                'footer.copyright': "Copyright © 2025 WaveCheck. Tous droits réservés."
+            },
+            en: {
+                tagline: "Test your network",
+                'nav.home': "Home",
+                'nav.test': "Test",
+                'nav.ranking': "Ranking",
+                'nav.history': "History",
+                'nav.reports': "Reports",
+                'nav.alerts': "Alerts",
+                'hero.tag': "🌍 Internet Quality Monitor",
+                'hero.title': "Global Internet Quality Test",
+                'hero.subtitle': "Visualize your network quality in your exact area and contribute to a collaborative world map.",
+                'hero.startTest': "Start a test",
+                'hero.recenter': "Center on my area",
+                'map.title': "Collaborative world map",
+                'map.subtitle': "Your test feeds into a public and anonymous map of network quality",
+                'map.detecting': "Detecting…",
+                'info.title': "Your network situation",
+                'info.ip': "Your IP",
+                'info.country': "Country / Region",
+                'info.city': "City",
+                'info.isp': "Operator",
+                'info.network': "Network type",
+                'howitworks.title': "How it works",
+                'howitworks.step1': "Detecting your location (ipwho.is)",
+                'howitworks.step2': "Fast and accurate speed test",
+                'howitworks.step3': "Charts, history and real-time alerts",
+                'footer.home': "Home",
+                'footer.test': "Test",
+                'footer.ranking': "Ranking",
+                'footer.free': "100% free — anonymous and public data",
+                'footer.copyright': "Copyright © 2025 WaveCheck. All rights reserved."
+            },
+            es: {
+                tagline: "Prueba tu red",
+                'nav.home': "Inicio",
+                'nav.test': "Prueba",
+                'nav.ranking': "Clasificación",
+                'nav.history': "Historial",
+                'nav.reports': "Informes",
+                'nav.alerts': "Alertas",
+                'hero.tag': "🌍 Monitor de Calidad de Internet",
+                'hero.title': "Prueba global de calidad de Internet",
+                'hero.subtitle': "Visualiza la calidad de tu red en tu área exacta y contribuye a un mapa mundial colaborativo.",
+                'hero.startTest': "Iniciar una prueba",
+                'hero.recenter': "Centrar en mi área",
+                'map.title': "Mapa mundial colaborativo",
+                'map.subtitle': "Tu prueba se alimenta en un mapa público y anónimo de calidad de red",
+                'map.detecting': "Detectando…",
+                'info.title': "Tu situación de red",
+                'info.ip': "Tu IP",
+                'info.country': "País / Región",
+                'info.city': "Ciudad",
+                'info.isp': "Operador",
+                'info.network': "Tipo de red",
+                'howitworks.title': "Cómo funciona",
+                'howitworks.step1': "Detectar tu ubicación (ipwho.is)",
+                'howitworks.step2': "Prueba de velocidad rápida y precisa",
+                'howitworks.step3': "Gráficos, historial y alertas en tiempo real",
+                'footer.home': "Inicio",
+                'footer.test': "Prueba",
+                'footer.ranking': "Clasificación",
+                'footer.free': "100% gratis — datos anónimos y públicos",
+                'footer.copyright': "Copyright © 2025 WaveCheck. Todos los derechos reservados."
+            }
+        };
+
+        // ===== SYSTÈME DE TRADUCTION =====
+        let currentLanguage = localStorage.getItem('wavecheck_language') || 'fr';
+
+        function translatePage() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const translation = translations[currentLanguage][key];
+                if (translation) {
+                    element.textContent = translation;
+                }
+            });
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('wavecheck_language', lang);
+            document.documentElement.lang = lang;
+            translatePage();
+        }
+
+        // ===== DARK MODE =====
+        const isDarkMode = localStorage.getItem('wavecheck_darkmode') === 'true';
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('wavecheck_darkmode', isDark);
+            this.textContent = isDark ? '☀️' : '🌙';
+        });
+
+        // Initialiser l'icône du thème au chargement
+        document.getElementById('themeToggle').textContent = isDarkMode ? '☀️' : '🌙';
+
+        // ===== SÉLECTEUR DE LANGUE =====
+        document.getElementById('languageSelect').value = currentLanguage;
+        document.getElementById('languageSelect').addEventListener('change', function() {
+            setLanguage(this.value);
+        });
+
+        // ===== DÉTECTION DE LOCALISATION AVEC IPWHO.IS =====
+        let userLocation = null;
+
+        async function detectLocation() {
+            try {
+                // Ajouter un timeout de 5 secondes
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+                clearTimeout(timeoutId);
+                const data = await response.json();
+
+                userLocation = {
+                    ip: data.ip,
+                    country: data.country_name,
+                    region: data.region,
+                    city: data.city,
+                    isp: data.org,
+                    type: data.network || 'Non détecté',
+                    latitude: parseFloat(data.latitude),
+                    longitude: parseFloat(data.longitude)
+                };
+
+                // Afficher les informations
+                document.getElementById('ipValue').textContent = data.ip;
+                document.getElementById('countryValue').textContent = `${data.country_name} — ${data.region}`;
+                document.getElementById('cityValue').textContent = data.city;
+                document.getElementById('ispValue').textContent = data.org;
+                document.getElementById('networkTypeValue').textContent = data.network || 'Non détecté';
+
+                document.getElementById('locationPill').textContent = `✓ ${data.city}, ${data.country_name}`;
+
+                // Initialiser la carte
+                initializeMap(data.latitude, data.longitude, data.city);
+            } catch (error) {
+                console.error('Erreur détection localisation:', error);
+                document.getElementById('locationPill').textContent = '⚠️ Localisation non disponible';
+            }
+        }
+
+        // ===== INITIALISATION CARTE LEAFLET =====
+        let map = null;
+        let userMarker = null;
+
+        function initializeMap(latitude, longitude, cityName) {
+            // Détruire la carte existante si elle existe
+            if (map !== null) {
+                map.remove();
+                map = null;
+            }
+
+            // Créer la carte avec une vue par défaut sur le monde au cas où
+            map = L.map('map').setView([latitude || 20, longitude || 0], latitude ? 10 : 2);
+
+            // Ajouter le fond OpenStreetMap
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19,
+                crossOrigin: true
+            }).addTo(map);
+
+            // Placer un marqueur à la position de l'utilisateur si fournie
+            if (latitude && longitude) {
+                userMarker = L.marker([latitude, longitude], {
+                    title: cityName
+                }).addTo(map).bindPopup(`<b>Vous êtes ici</b><br>${cityName}`);
+
+                // Ajouter un cercle de précision autour du marqueur
+                L.circle([latitude, longitude], {
+                    color: '#1A73E8',
+                    fillColor: '#E8F0FE',
+                    fillOpacity: 0.2,
+                    weight: 2,
+                    radius: 1000
+                }).addTo(map);
+            }
+        }
+
+        // ===== BOUTON RECENTRER =====
+        document.getElementById('recenterBtn').addEventListener('click', function() {
+            if (userLocation && map) {
+                map.setView([userLocation.latitude, userLocation.longitude], 10);
+            }
+        });
+
+        // ===== ÉVÉNEMENT DÉMARRER TEST =====
+        document.getElementById('startTestBtn').addEventListener('click', function() {
+            alert(currentLanguage === 'fr' 
+                ? 'Module de test en préparation. Vous serez redirigé bientôt.' 
+                : currentLanguage === 'en'
+                ? 'Test module coming soon. You will be redirected shortly.'
+                : 'Módulo de prueba próximamente. Será redirigido pronto.');
+        });
+
+        // ===== INITIALISATION AU CHARGEMENT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            translatePage();
+            detectLocation();
+        });
+    </script>
+</body>
+</html>
+

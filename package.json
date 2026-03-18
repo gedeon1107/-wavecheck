@@ -1,0 +1,18 @@
+{
+  "name": "wavecheck",
+  "version": "1.0.0",
+  "description": "WaveCheck est un site web (100% gratuit) pour tester la qualité d’Internet à l’échelle mondiale.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "firebase": "^12.10.0",
+    "i18next": "^25.8.18",
+    "i18next-browser-languagedetector": "^8.2.1"
+  }
+}
