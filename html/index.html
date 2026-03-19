@@ -513,7 +513,7 @@
     <!-- ==================== HEADER ==================== -->
     <header class="header">
         <div class="header-container">
-            <a href="#" class="logo-section">
+            <a href="index.html" class="logo-section">
                 <span>🌊</span>
                 <div class="logo-text">
                     <strong>WaveCheck</strong>
@@ -522,12 +522,12 @@
             </a>
 
             <nav data-i18n="nav">
-                <a href="#" class="nav-link" data-i18n="nav.home">Accueil</a>
-                <a href="#" class="nav-link" data-i18n="nav.test">Test</a>
-                <a href="#" class="nav-link" data-i18n="nav.ranking">Classement</a>
-                <a href="#" class="nav-link" data-i18n="nav.history">Historique</a>
-                <a href="#" class="nav-link" data-i18n="nav.reports">Rapports</a>
-                <a href="#" class="nav-link" data-i18n="nav.alerts">Alertes</a>
+                <a href="index.html" class="nav-link" data-i18n="nav.home">Accueil</a>
+                <a href="test.html" class="nav-link" data-i18n="nav.test">Test</a>
+                <a href="ranking.html" class="nav-link" data-i18n="nav.ranking">Classement</a>
+                <a href="history.html" class="nav-link" data-i18n="nav.history">Historique</a>
+                <a href="reports.html" class="nav-link" data-i18n="nav.reports">Rapports</a>
+                <a href="alerts.html" class="nav-link" data-i18n="nav.alerts">Alertes</a>
             </nav>
 
             <div class="header-actions">
@@ -919,11 +919,7 @@
 
         // ===== ÉVÉNEMENT DÉMARRER TEST =====
         document.getElementById('startTestBtn').addEventListener('click', function() {
-            alert(currentLanguage === 'fr' 
-                ? 'Module de test en préparation. Vous serez redirigé bientôt.' 
-                : currentLanguage === 'en'
-                ? 'Test module coming soon. You will be redirected shortly.'
-                : 'Módulo de prueba próximamente. Será redirigido pronto.');
+            window.location.href = 'test.html';
         });
 
         // ===== INITIALISATION AU CHARGEMENT =====
