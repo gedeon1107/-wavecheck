@@ -21,6 +21,11 @@
     
     <!-- Leaflet JS pour la carte -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="./firebase/init.js"></script>
 
     <!-- ==================== STYLES PERSONNALISÉS ==================== -->
     <style>
@@ -846,6 +851,63 @@
                     radius: 1000
                 }).addTo(map);
             }
+            
+            // Charger les tests depuis Firebase et afficher les marqueurs
+            loadTestMarkers();
+        }
+        
+        // ===== CHARGER ET AFFICHER LES MARQUEURS DES TESTS FIREBASE =====
+        function loadTestMarkers() {
+            if (!map) return;
+            
+            getAllTests(tests => {
+                // Nettoyer les anciens marqueurs (sauf le marqueur utilisateur)
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker && layer !== userMarker) {
+                        map.removeLayer(layer);
+                    }
+                    if (layer instanceof L.Circle && layer !== userMarker) {
+                        map.removeLayer(layer);
+                    }
+                });
+                
+                // Ajouter les marqueurs des tests
+                tests.forEach(test => {
+                    // Vérifier que le test a des coordonnées
+                    if (test.lat && test.lon) {
+                        const speedColor = test.download >= 50 ? '#34A853' : 
+                                         test.download >= 25 ? '#4285F4' : 
+                                         test.download >= 10 ? '#FBBC04' : '#EA4335';
+                        
+                        const markerIcon = L.divIcon({
+                            className: 'test-marker',
+                            html: `<div style="
+                                background-color: ${speedColor};
+                                border-radius: 50%;
+                                width: 24px;
+                                height: 24px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: white;
+                                font-size: 12px;
+                                font-weight: bold;
+                            ">📡</div>`,
+                            iconSize: [24, 24]
+                        });
+                        
+                        L.marker([test.lat, test.lon], { icon: markerIcon })
+                            .addTo(map)
+                            .bindPopup(`
+                                <b>${test.ville || 'Test'}</b><br>
+                                ⬇️ ${test.download} Mbps<br>
+                                ⬆️ ${test.upload} Mbps<br>
+                                🎯 ${test.ping} ms<br>
+                                📅 ${test.date || new Date(test.timestamp).toLocaleString()}
+                            `);
+                    }
+                });
+            });
         }
 
         // ===== BOUTON RECENTRER =====

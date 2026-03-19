@@ -7,6 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.tailwindcss.com" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="../firebase/init.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -1016,7 +1022,39 @@
         });
         themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
 
-        // ================== RÉCUPÉRATION DES DONNÉES ==================
+        // ================== RÉCUPÉRATION DES DONNÉES DEPUIS FIREBASE =====
+        function loadHistoryFromFirebase() {
+            getAllTests(tests => {
+                // Convertir les données Firebase au format attendu
+                allData = tests.map(test => ({
+                    date: test.date || new Date(test.timestamp).toLocaleDateString(),
+                    time: test.date ? test.date.split(' ').pop() || '—' : new Date(test.timestamp).toLocaleTimeString(),
+                    download: parseFloat(test.download) || 0,
+                    upload: parseFloat(test.upload) || 0,
+                    ping: parseFloat(test.ping) || 0,
+                    quality: test.qualite || 'unknown',
+                    pays: test.pays,
+                    ville: test.ville
+                }));
+                
+                // Trier par date décroissante (plus récents d'abord)
+                allData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Charger aussi les données du localStorage pour compatibilité
+                const savedData = JSON.parse(localStorage.getItem('testHistory') || '[]');
+                allData = [...allData, ...savedData];
+                
+                // Initialiser l'affichage
+                filteredData = allData;
+                renderTable();
+                updateStats();
+                updateChart();
+            });
+        }
+
+        let allData = [];
+        
+        // ================== RÉCUPÉRATION DES DONNÉES (FALLBACK) ==================
         function getTestData() {
             // Données de test enrichies (simulées pour démo)
             const sampleData = [
@@ -1035,8 +1073,6 @@
             const savedData = JSON.parse(localStorage.getItem('testHistory') || '[]');
             return [...sampleData, ...savedData];
         }
-
-        let allData = getTestData();
 
         // ================== CALCUL DES STATISTIQUES ==================
         function calculateStats(data) {
@@ -1320,9 +1356,7 @@
 
         // Initialisation au chargement
         translatePage();
-        updateStats();
-        renderTable();
-        updateChart();
+        loadHistoryFromFirebase();
     </script>
 </body>
 </html>

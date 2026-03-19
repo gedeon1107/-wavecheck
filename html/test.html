@@ -7,6 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
     <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="../firebase/init.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -1001,6 +1007,41 @@
             history = history.slice(0, 5); // Garder max 5 tests
             localStorage.setItem('testHistory', JSON.stringify(history));
             displayHistory();
+            
+            // Sauvegarder dans Firebase
+            const upload = parseFloat(document.getElementById('uploadSpeed').textContent);
+            const ping = parseFloat(document.getElementById('pingTime').textContent);
+            const download = speed;
+            const qualityInfo = getQualityInfo(speed);
+            
+            const testData = {
+                download: download.toFixed(1),
+                upload: isNaN(upload) ? 0 : upload.toFixed(1),
+                ping: isNaN(ping) ? 0 : ping,
+                qualite: qualityInfo.label,
+                date: new Date().toLocaleString(currentLanguage),
+                timestamp: Date.now()
+            };
+            
+            // Récupérer la localisation si disponible
+            const locationText = document.getElementById('locationText');
+            if (locationText && locationText.textContent && locationText.textContent !== '📍 Localisation non disponible') {
+                // Format: "City, Country (IP)"
+                const locationMatch = locationText.textContent.match(/^(.+?),\s*(.+?)\s*\((.+?)\)$/);
+                if (locationMatch) {
+                    testData.ville = locationMatch[1];
+                    testData.pays = locationMatch[2];
+                    testData.ip = locationMatch[3];
+                }
+            }
+            
+            // Ajouter les coordonnées si géolocalisation disponible
+            if (window.userLocation) {
+                testData.lat = window.userLocation.lat;
+                testData.lon = window.userLocation.lng;
+            }
+            
+            saveTest(testData);
         }
 
         function displayHistory() {

@@ -7,6 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.tailwindcss.com" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="../firebase/init.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -841,6 +847,97 @@
                 }
             });
         }
+        
+        // ================== CHARGER CLASSEMENT RÉEL DEPUIS FIREBASE =====
+        function loadRealRanking() {
+            getAllTests(tests => {
+                if (tests.length === 0) {
+                    // Utiliser les données statiques si pas de tests
+                    displayRanking(rankingData);
+                    return;
+                }
+                
+                // Calculer la vitesse moyenne par pays
+                const countryStats = {};
+                tests.forEach(test => {
+                    const country = test.pays || 'Non détecté';
+                    if (!countryStats[country]) {
+                        countryStats[country] = {
+                            speeds: [],
+                            pings: [],
+                            uploads: [],
+                            count: 0
+                        };
+                    }
+                    countryStats[country].speeds.push(parseFloat(test.download) || 0);
+                    countryStats[country].pings.push(parseFloat(test.ping) || 0);
+                    countryStats[country].uploads.push(parseFloat(test.upload) || 0);
+                    countryStats[country].count++;
+                });
+                
+                // Construire le classement réel
+                const realRanking = Object.entries(countryStats).map(([country, stats]) => {
+                    const avgSpeed = stats.speeds.reduce((a, b) => a + b, 0) / stats.speeds.length;
+                    
+                    let quality = 'slow';
+                    if (avgSpeed >= 50) quality = 'excellent';
+                    else if (avgSpeed >= 25) quality = 'good';
+                    else if (avgSpeed >= 10) quality = 'medium';
+                    
+                    // Trouver le flag et continent depuis rankingData
+                    const staticData = rankingData.find(r => r.country.toLowerCase() === country.toLowerCase());
+                    
+                    return {
+                        country: country,
+                        flag: staticData?.flag || '🌍',
+                        speed: avgSpeed.toFixed(1),
+                        quality: quality,
+                        continent: staticData?.continent || 'unknown',
+                        trend: 'stable',
+                        testCount: stats.count
+                    };
+                });
+                
+                // Trier par vitesse décroissante et ajouter le rang
+                realRanking.sort((a, b) => parseFloat(b.speed) - parseFloat(a.speed));
+                realRanking.forEach((item, index) => {
+                    item.rank = index + 1;
+                });
+                
+                // Fusionner avec les données statiques pour les pays sans tests
+                const finalRanking = realRanking.concat(
+                    rankingData.filter(r => !realRanking.find(rr => rr.country.toLowerCase() === r.country.toLowerCase()))
+                );
+                
+                // Rétrier et garder le rang à jour
+                finalRanking.sort((a, b) => a.rank - b.rank);
+                finalRanking.forEach((item, index) => {
+                    item.rank = index + 1;
+                });
+                
+                displayRanking(finalRanking);
+            });
+        }
+        
+        // ================== AFFICHER LE CLASSEMENT =====
+        function displayRanking(data) {
+            const tbody = document.getElementById('rankingTableBody');
+            let currentContinent = 'all';
+            
+            const filteredData = currentContinent === 'all' 
+                ? data 
+                : data.filter(item => item.continent === currentContinent);
+            
+            tbody.innerHTML = filteredData.map(item => `
+                <tr>
+                    <td><strong>#${item.rank}</strong></td>
+                    <td>${item.flag} ${item.country}</td>
+                    <td><strong>${item.speed} Mbps</strong></td>
+                    <td><span class="quality-badge quality-${item.quality}">${translations[currentLanguage][`quality.${item.quality}`] || item.quality}</span></td>
+                    <td><span class="trend ${item.trend}">${item.trend === 'up' ? '📈' : item.trend === 'down' ? '📉' : '➡️'}</span></td>
+                </tr>
+            `).join('');
+        }
 
         // Sélecteur de langue
         document.getElementById('langSelect').value = currentLanguage;
@@ -1001,8 +1098,7 @@
 
         // Initialisation au chargement
         translatePage();
-        renderRankingTable(currentFilter);
-        initializeChart();
+        loadRealRanking();
         detectUserLocation();
     </script>
 </body>
