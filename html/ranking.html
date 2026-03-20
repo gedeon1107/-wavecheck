@@ -959,34 +959,57 @@
         // ================== DÉTECTION DE LOCALISATION ==================
         async function detectUserLocation() {
             try {
+                let data = null;
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
                 
-                const response = await fetch('https://ipapi.co/json/', {
-                    signal: controller.signal,
-                    crossOrigin: true
-                });
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) throw new Error('API error');
-                const data = await response.json();
-                
-                const countryCode = data.country_code || 'UNKNOWN';
-                const countryName = data.country_name || 'Inconnu';
-                
-                // Trouver le classement de l'utilisateur
-                const userCountry = rankingData.find(c => c.country.toUpperCase().includes(countryName.toUpperCase()));
-                
-                if (userCountry) {
-                    document.getElementById('userRank').textContent = `#${userCountry.rank}`;
-                    document.getElementById('userCountry').textContent = `${userCountry.flag} ${userCountry.country}`;
-                    document.getElementById('userSpeed').textContent = `${userCountry.speed} Mbps - ${translations[currentLanguage][`quality.${userCountry.quality}`] || userCountry.quality}`;
-                } else {
-                    // Pays non dans le classement
-                    document.getElementById('userRank').textContent = `> 21`;
-                    document.getElementById('userCountry').textContent = countryName;
-                    document.getElementById('userSpeed').textContent = 'Non classé';
+                try {
+                    // Essai 1 : ipwho.is
+                    const r1 = await fetch('https://ipwho.is/', { signal: controller.signal });
+                    const d1 = await r1.json();
+                    if (d1.success) {
+                        data = { country_code: d1.country_code, country_name: d1.country_name };
+                        clearTimeout(timeoutId);
+                    }
+                } catch (e) {
+                    try {
+                        // Essai 2 : ip-api.com
+                        const r2 = await fetch('http://ip-api.com/json/', { signal: controller.signal });
+                        const d2 = await r2.json();
+                        if (d2.status === 'success') {
+                            data = { country_code: d2.countryCode, country_name: d2.country };
+                            clearTimeout(timeoutId);
+                        }
+                    } catch (e2) {
+                        try {
+                            // Essai 3 : ipify (juste l'IP, pas de pays)\n                            const r3 = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+                            const d3 = await r3.json();
+                            data = { country_code: 'UNKNOWN', country_name: 'Inconnu' };
+                            clearTimeout(timeoutId);
+                        } catch (e3) {
+                            console.log('Tous les essais de localisation ont échoué');
+                        }
+                    }
                 }
+                
+                if (data) {
+                    const countryCode = data.country_code || 'UNKNOWN';
+                    const countryName = data.country_name || 'Inconnu';
+                    
+                    // Trouver le classement de l'utilisateur
+                    const userCountry = rankingData.find(c => c.country.toUpperCase().includes(countryName.toUpperCase()));
+                    
+                    if (userCountry) {
+                        document.getElementById('userRank').textContent = `#${userCountry.rank}`;
+                        document.getElementById('userCountry').textContent = `${userCountry.flag} ${userCountry.country}`;
+                        document.getElementById('userSpeed').textContent = `${userCountry.speed} Mbps - ${translations[currentLanguage][`quality.${userCountry.quality}`] || userCountry.quality}`;
+                    } else {
+                        // Pays non dans le classement
+                        document.getElementById('userRank').textContent = `> 21`;
+                        document.getElementById('userCountry').textContent = countryName;
+                        document.getElementById('userSpeed').textContent = 'Non classé';
+                    }
+                } else {\n                    throw new Error('Localisation échouée');\n                }
             } catch (error) {
                 document.getElementById('userRank').textContent = '—';
                 document.getElementById('userCountry').textContent = 'Localisation indisponible';

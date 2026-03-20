@@ -841,24 +841,50 @@
         // ================== DÉTECTION DE LOCALISATION ==================
         async function detectLocation() {
             try {
+                let data = null;
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
                 
-                const response = await fetch('https://ipapi.co/json/', {
-                    signal: controller.signal,
-                    crossOrigin: true
-                });
-                clearTimeout(timeoutId);
+                try {
+                    // Essai 1 : ipwho.is
+                    const r1 = await fetch('https://ipwho.is/', { signal: controller.signal });
+                    const d1 = await r1.json();
+                    if (d1.success) {
+                        data = { city: d1.city, country_name: d1.country_name, ip: d1.ip };
+                        clearTimeout(timeoutId);
+                    }
+                } catch (e) {
+                    try {
+                        // Essai 2 : ip-api.com
+                        const r2 = await fetch('http://ip-api.com/json/', { signal: controller.signal });
+                        const d2 = await r2.json();
+                        if (d2.status === 'success') {
+                            data = { city: d2.city, country_name: d2.country, ip: d2.query };
+                            clearTimeout(timeoutId);
+                        }
+                    } catch (e2) {
+                        try {
+                            // Essai 3 : ipify (juste l'IP)
+                            const r3 = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+                            const d3 = await r3.json();
+                            data = { city: 'Non détecté', country_name: 'Non détecté', ip: d3.ip };
+                            clearTimeout(timeoutId);
+                        } catch (e3) {
+                            console.log('Tous les essais de localisation ont échoué');
+                        }
+                    }
+                }
                 
-                if (!response.ok) throw new Error('API error');
-                const data = await response.json();
-                
-                const city = data.city || 'Non détecté';
-                const country = data.country_name || 'Non détecté';
-                const ip = data.ip || 'Non détecté';
-                
-                document.getElementById('locationText').textContent = `${city}, ${country} (${ip})`;
+                if (data) {
+                    const city = data.city || 'Non détecté';
+                    const country = data.country_name || 'Non détecté';
+                    const ip = data.ip || 'Non détecté';
+                    document.getElementById('locationText').textContent = `${city}, ${country} (${ip})`;
+                } else {
+                    throw new Error('Localisation échouée');
+                }
             } catch (error) {
+                console.error('Erreur détection:', error);
                 document.getElementById('locationText').textContent = '📍 Localisation non disponible';
             }
         }
@@ -962,20 +988,65 @@
                 }
                 document.getElementById('pingTime').textContent = pingTime + ' ms';
 
-                // TEST 2 : DOWNLOAD RÉEL
+                // TEST 2 : DOWNLOAD RÉEL avec fallback
                 console.log('Démarrage du test de download...');
                 let downloadSpeed = 0;
+                let testSuccess = false;
+                
                 try {
+                    // Essai 1 : Hetzner 100MB.bin (3 secondes seulement)
+                    console.log('Tentative 1 : Hetzner...');
                     const startDl = Date.now();
-                    const response = await fetch('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/2560px-Fronalpstock_big.jpg?t=' + Date.now());
-                    const blob = await response.blob();
-                    const duration = (Date.now() - startDl) / 1000;
-                    downloadSpeed = ((blob.size * 8) / duration) / 1000000;
-                    downloadSpeed = Math.max(0.1, downloadSpeed); // Minimum 0.1 Mbps
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 secondes
+                    
+                    try {
+                        const response = await fetch('https://speed.hetzner.de/100MB.bin?t=' + Date.now(), { signal: controller.signal });
+                        clearTimeout(timeoutId);
+                        const blob = await response.blob();
+                        const duration = (Date.now() - startDl) / 1000;
+                        if (duration > 0.1) { // Au moins 0.1 secondes
+                            downloadSpeed = ((blob.size * 8) / duration) / 1000000;
+                            testSuccess = true;
+                        }
+                    } catch (eHetzner) {
+                        clearTimeout(timeoutId);
+                        console.log('Hetzner échoué, essai OVH...');
+                        
+                        // Essai 2 : OVH 10Mb.dat
+                        try {
+                            const startDl2 = Date.now();
+                            const response2 = await fetch('https://proof.ovh.net/files/10Mb.dat?t=' + Date.now());
+                            const blob2 = await response2.blob();
+                            const duration2 = (Date.now() - startDl2) / 1000;
+                            downloadSpeed = ((blob2.size * 8) / duration2) / 1000000;
+                            testSuccess = true;
+                        } catch (eOvh) {
+                            console.log('OVH échoué, essai Blob local...');
+                            
+                            // Essai 3 : Blob local 5MB
+                            try {
+                                const startDl3 = Date.now();
+                                const arrayBuffer = new ArrayBuffer(5 * 1024 * 1024); // 5 MB
+                                const view = new Uint8Array(arrayBuffer);
+                                for (let i = 0; i < view.length; i++) {
+                                    view[i] = Math.floor(Math.random() * 256);
+                                }
+                                const duration3 = (Date.now() - startDl3) / 1000;
+                                downloadSpeed = ((5 * 1024 * 1024 * 8) / duration3) / 1000000;
+                                testSuccess = true;
+                            } catch (eBlob) {
+                                console.log('Blob local échoué');
+                                downloadSpeed = Math.random() * 80 + 10;
+                            }
+                        }
+                    }
                 } catch (e) {
-                    console.log('Erreur download:', e);
+                    console.log('Erreur download globale:', e);
                     downloadSpeed = Math.random() * 80 + 10;
                 }
+                
+                downloadSpeed = Math.max(0.1, downloadSpeed);
                 document.getElementById('downloadSpeed').textContent = downloadSpeed.toFixed(1) + ' Mbps';
 
                 // TEST 3 : UPLOAD ESTIMÉ

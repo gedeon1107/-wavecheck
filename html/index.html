@@ -774,41 +774,97 @@
             setLanguage(this.value);
         });
 
-        // ===== DÉTECTION DE LOCALISATION AVEC IPWHO.IS =====
+        // ===== DÉTECTION DE LOCALISATION AVEC FALLBACKS =====
         let userLocation = null;
 
         async function detectLocation() {
             try {
-                // Ajouter un timeout de 5 secondes
+                let data = null;
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
                 
-                const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-                clearTimeout(timeoutId);
-                const data = await response.json();
+                try {
+                    // Essai 1 : ipwho.is
+                    const r1 = await fetch('https://ipwho.is/', { signal: controller.signal });
+                    const d1 = await r1.json();
+                    if (d1.success) {
+                        data = {
+                            ip: d1.ip,
+                            country_name: d1.country_name,
+                            region: d1.region,
+                            city: d1.city,
+                            org: 'Non détecté',
+                            network: 'Non détecté',
+                            latitude: d1.latitude || 0,
+                            longitude: d1.longitude || 0
+                        };
+                        clearTimeout(timeoutId);
+                    }
+                } catch (e) {
+                    try {
+                        // Essai 2 : ip-api.com
+                        const r2 = await fetch('http://ip-api.com/json/', { signal: controller.signal });
+                        const d2 = await r2.json();
+                        if (d2.status === 'success') {
+                            data = {
+                                ip: d2.query,
+                                country_name: d2.country,
+                                region: d2.regionName,
+                                city: d2.city,
+                                org: d2.org || 'Non détecté',
+                                network: 'Non détecté',
+                                latitude: d2.lat || 0,
+                                longitude: d2.lon || 0
+                            };
+                            clearTimeout(timeoutId);
+                        }
+                    } catch (e2) {\n                        try {
+                            // Essai 3 : ipify (juste l'IP)
+                            const r3 = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+                            const d3 = await r3.json();
+                            data = {
+                                ip: d3.ip,
+                                country_name: 'Non détecté',
+                                region: 'Non détecté',
+                                city: 'Non détecté',
+                                org: 'Non détecté',
+                                network: 'Non détecté',
+                                latitude: 0,
+                                longitude: 0
+                            };
+                            clearTimeout(timeoutId);
+                        } catch (e3) {
+                            console.log('Tous les essais de localisation ont échoué');
+                        }
+                    }
+                }
+                
+                if (data) {
+                    userLocation = {
+                        ip: data.ip,
+                        country: data.country_name,
+                        region: data.region,
+                        city: data.city,
+                        isp: data.org,
+                        type: data.network || 'Non détecté',
+                        latitude: parseFloat(data.latitude) || 0,
+                        longitude: parseFloat(data.longitude) || 0
+                    };
 
-                userLocation = {
-                    ip: data.ip,
-                    country: data.country_name,
-                    region: data.region,
-                    city: data.city,
-                    isp: data.org,
-                    type: data.network || 'Non détecté',
-                    latitude: parseFloat(data.latitude),
-                    longitude: parseFloat(data.longitude)
-                };
+                    // Afficher les informations
+                    document.getElementById('ipValue').textContent = data.ip;
+                    document.getElementById('countryValue').textContent = `${data.country_name} — ${data.region}`;
+                    document.getElementById('cityValue').textContent = data.city;
+                    document.getElementById('ispValue').textContent = data.org;
+                    document.getElementById('networkTypeValue').textContent = data.network || 'Non détecté';
 
-                // Afficher les informations
-                document.getElementById('ipValue').textContent = data.ip;
-                document.getElementById('countryValue').textContent = `${data.country_name} — ${data.region}`;
-                document.getElementById('cityValue').textContent = data.city;
-                document.getElementById('ispValue').textContent = data.org;
-                document.getElementById('networkTypeValue').textContent = data.network || 'Non détecté';
+                    document.getElementById('locationPill').textContent = `✓ ${data.city}, ${data.country_name}`;
 
-                document.getElementById('locationPill').textContent = `✓ ${data.city}, ${data.country_name}`;
-
-                // Initialiser la carte
-                initializeMap(data.latitude, data.longitude, data.city);
+                    // Initialiser la carte
+                    initializeMap(parseFloat(data.latitude) || 0, parseFloat(data.longitude) || 0, data.city);
+                } else {
+                    throw new Error('Localisation échouée');
+                }
             } catch (error) {
                 console.error('Erreur détection localisation:', error);
                 document.getElementById('locationPill').textContent = '⚠️ Localisation non disponible';
