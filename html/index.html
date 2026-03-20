@@ -25,7 +25,6 @@
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <script src="./firebase/init.js"></script>
 
     <!-- ==================== STYLES PERSONNALISÉS ==================== -->
     <style>
@@ -46,55 +45,18 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        /* Mode clair (par défaut) */
-        body {
-            background-color: #FFFFFF;
-            color: #1F2937;
-        }
-
-        /* Mode sombre */
-        body.dark-mode {
-            background-color: #0F172A;
-            color: #F1F5F9;
-        }
-
-        body.dark-mode .header {
-            background-color: #1E293B;
-            border-bottom-color: #334155;
-        }
-
-        body.dark-mode .card {
-            background-color: #1E293B;
-            border-color: #334155;
-        }
-
-        body.dark-mode .nav-link {
-            color: #CBD5E1;
-        }
-
-        body.dark-mode .nav-link:hover {
-            color: var(--blue-primary);
-        }
-
-        body.dark-mode input,
-        body.dark-mode select {
-            background-color: #334155;
-            color: #F1F5F9;
-            border-color: #475569;
+            background-color: #0A1628;
+            color: #FFFFFF;
         }
 
         /* Header */
         .header {
-            background-color: #FFFFFF;
-            border-bottom: 1px solid #E5E7EB;
+            background-color: #0F2040;
+            border-bottom: 1px solid #1E3A5F;
             padding: 1rem 2rem;
             position: sticky;
             top: 0;
             z-index: 100;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .header-container {
@@ -146,7 +108,7 @@
 
         .nav-link {
             text-decoration: none;
-            color: #6B7280;
+            color: #A0B4C8;
             font-weight: 500;
             font-size: 0.875rem;
             transition: color 0.2s ease;
@@ -155,8 +117,7 @@
         }
 
         .nav-link:hover {
-            color: var(--blue-primary);
-            background-color: var(--blue-light);
+            color: #1A73E8;
         }
 
         .header-actions {
@@ -168,36 +129,17 @@
 
         select, input {
             padding: 0.5rem 0.75rem;
-            border: 1px solid #D1D5DB;
+            border: 1px solid #1E3A5F;
             border-radius: 0.375rem;
             font-size: 0.875rem;
-            background-color: #FFFFFF;
-            color: #1F2937;
+            background-color: #0F2040;
+            color: #FFFFFF;
             cursor: pointer;
             transition: border-color 0.2s ease;
         }
 
         select:hover, input:hover {
-            border-color: var(--blue-primary);
-        }
-
-        button.theme-toggle {
-            background: none;
-            border: 1px solid #D1D5DB;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-
-        button.theme-toggle:hover {
-            background-color: #F3F4F6;
-            border-color: var(--blue-primary);
-        }
-
-        body.dark-mode button.theme-toggle:hover {
-            background-color: #334155;
+            border-color: #1A73E8;
         }
 
         /* Main container */
@@ -215,33 +157,21 @@
             text-align: center;
             padding: 3rem 2rem;
             border-radius: 1rem;
-            background: linear-gradient(135deg, var(--blue-light) 0%, transparent 100%);
-        }
-
-        body.dark-mode .hero {
             background: linear-gradient(135deg, rgba(26, 115, 232, 0.1) 0%, transparent 100%);
         }
 
         .hero h1 {
             font-size: 2.25rem;
             font-weight: 700;
-            color: #1F2937;
+            color: #FFFFFF;
             margin: 1rem 0;
             line-height: 1.2;
         }
 
-        body.dark-mode .hero h1 {
-            color: #F1F5F9;
-        }
-
         .hero p {
             font-size: 0.875rem;
-            color: #6B7280;
+            color: #A0B4C8;
             margin: 0.5rem 0 2rem 0;
-        }
-
-        body.dark-mode .hero p {
-            color: #CBD5E1;
         }
 
         .hero-tag {
@@ -249,12 +179,8 @@
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #6B7280;
+            color: #A0B4C8;
             margin-bottom: 1rem;
-        }
-
-        body.dark-mode .hero-tag {
-            color: #CBD5E1;
         }
 
         .hero-actions {
@@ -317,22 +243,14 @@
         .card h2 {
             font-size: 1.25rem;
             font-weight: 700;
-            color: #1F2937;
+            color: #FFFFFF;
             margin: 0;
-        }
-
-        body.dark-mode .card h2 {
-            color: #F1F5F9;
         }
 
         .card-subtitle {
             font-size: 0.75rem;
-            color: #9CA3AF;
+            color: #A0B4C8;
             margin-top: 0.25rem;
-        }
-
-        body.dark-mode .card-subtitle {
-            color: #64748B;
         }
 
         /* Map */
@@ -352,10 +270,6 @@
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-        }
-
-        body.dark-mode .pill {
-            background-color: rgba(26, 115, 232, 0.2);
         }
 
         /* Grid layout */
@@ -396,11 +310,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #E5E7EB;
-        }
-
-        body.dark-mode .kv-row {
-            border-bottom-color: #334155;
+            border-bottom: 1px solid #1E3A5F;
         }
 
         .kv-row:last-child {
@@ -409,39 +319,25 @@
 
         .kv-k {
             font-weight: 600;
-            color: #6B7280;
+            color: #A0B4C8;
             font-size: 0.875rem;
-        }
-
-        body.dark-mode .kv-k {
-            color: #CBD5E1;
         }
 
         .kv-v {
             font-weight: 700;
-            color: #1F2937;
+            color: #FFFFFF;
             font-size: 0.875rem;
-        }
-
-        body.dark-mode .kv-v {
-            color: #F1F5F9;
         }
 
         /* Footer */
         footer {
-            background-color: #F9FAFB;
-            border-top: 1px solid #E5E7EB;
+            background-color: #0F2040;
+            border-top: 1px solid #1E3A5F;
             padding: 2rem;
             text-align: center;
             margin-top: 4rem;
             font-size: 0.875rem;
-            color: #9CA3AF;
-        }
-
-        body.dark-mode footer {
-            background-color: #1E293B;
-            border-top-color: #334155;
-            color: #64748B;
+            color: #A0B4C8;
         }
 
         .footer-links {
@@ -453,30 +349,21 @@
         }
 
         .footer-links a {
-            color: #6B7280;
+            color: #A0B4C8;
             text-decoration: none;
             font-weight: 500;
         }
 
-        body.dark-mode .footer-links a {
-            color: #CBD5E1;
-        }
-
         .footer-links a:hover {
-            color: var(--blue-primary);
+            color: #1A73E8;
         }
 
         .footer-copyright {
             margin-top: 1rem;
             padding-top: 1rem;
-            border-top: 1px solid #E5E7EB;
-            color: #9CA3AF;
+            border-top: 1px solid #1E3A5F;
+            color: #A0B4C8;
             font-size: 0.75rem;
-        }
-
-        body.dark-mode .footer-copyright {
-            border-top-color: #334155;
-            color: #64748B;
         }
 
         /* List styles */
@@ -490,20 +377,16 @@
             padding: 0.75rem 0;
             padding-left: 1.5rem;
             position: relative;
-            color: #6B7280;
+            color: #A0B4C8;
             font-size: 0.875rem;
             line-height: 1.5;
-        }
-
-        body.dark-mode ul.list li {
-            color: #CBD5E1;
         }
 
         ul.list li:before {
             content: "✓";
             position: absolute;
             left: 0;
-            color: var(--blue-primary);
+            color: #1A73E8;
             font-weight: 700;
         }
     </style>
@@ -536,9 +419,6 @@
                     <option value="en">EN</option>
                     <option value="es">ES</option>
                 </select>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                    🌙
-                </button>
             </div>
         </div>
     </header>
@@ -752,22 +632,6 @@
             translatePage();
         }
 
-        // ===== DARK MODE =====
-        const isDarkMode = localStorage.getItem('wavecheck_darkmode') === 'true';
-        if (isDarkMode) {
-            document.body.classList.add('dark-mode');
-        }
-
-        document.getElementById('themeToggle').addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('wavecheck_darkmode', isDark);
-            this.textContent = isDark ? '☀️' : '🌙';
-        });
-
-        // Initialiser l'icône du thème au chargement
-        document.getElementById('themeToggle').textContent = isDarkMode ? '☀️' : '🌙';
-
         // ===== SÉLECTEUR DE LANGUE =====
         document.getElementById('languageSelect').value = currentLanguage;
         document.getElementById('languageSelect').addEventListener('change', function() {
@@ -778,97 +642,73 @@
         let userLocation = null;
 
         async function detectLocation() {
-            try {
-                let data = null;
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
-                
-                try {
-                    // Essai 1 : ipwho.is
-                    const r1 = await fetch('https://ipwho.is/', { signal: controller.signal });
-                    const d1 = await r1.json();
-                    if (d1.success) {
-                        data = {
-                            ip: d1.ip,
-                            country_name: d1.country_name,
-                            region: d1.region,
-                            city: d1.city,
-                            org: 'Non détecté',
-                            network: 'Non détecté',
-                            latitude: d1.latitude || 0,
-                            longitude: d1.longitude || 0
-                        };
-                        clearTimeout(timeoutId);
-                    }
-                } catch (e) {
+            const locationPill = document.getElementById('locationPill');
+            
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
                     try {
-                        // Essai 2 : ip-api.com
-                        const r2 = await fetch('http://ip-api.com/json/', { signal: controller.signal });
-                        const d2 = await r2.json();
-                        if (d2.status === 'success') {
-                            data = {
-                                ip: d2.query,
-                                country_name: d2.country,
-                                region: d2.regionName,
-                                city: d2.city,
-                                org: d2.org || 'Non détecté',
-                                network: 'Non détecté',
-                                latitude: d2.lat || 0,
-                                longitude: d2.lon || 0
-                            };
-                            clearTimeout(timeoutId);
+                        const res = await fetch(
+                            'https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json&accept-language=fr'
+                        );
+                        const data = await res.json();
+                        console.log('Nominatim data:', data);
+                        
+                        const ville = data.address.city || 
+                                      data.address.town || 
+                                      data.address.municipality ||
+                                      data.address.county ||
+                                      data.address.state || 
+                                      'Ville inconnue';
+                        const pays = data.address.country || 'Pays inconnu';
+                        
+                        document.getElementById('cityValue').textContent = ville;
+                        document.getElementById('countryValue').textContent = pays;
+                        locationPill.textContent = '✓ ' + ville + ', ' + pays;
+                        locationPill.style.background = '#00C853';
+                        
+                        if (map) map.setView([lat, lon], 11);
+                        
+                        if (typeof L !== 'undefined') {
+                            L.marker([lat, lon]).addTo(map).bindPopup('Vous êtes ici').openPopup();
                         }
-                    } catch (e2) {\n                        try {
-                            // Essai 3 : ipify (juste l'IP)
-                            const r3 = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
-                            const d3 = await r3.json();
-                            data = {
-                                ip: d3.ip,
-                                country_name: 'Non détecté',
-                                region: 'Non détecté',
-                                city: 'Non détecté',
-                                org: 'Non détecté',
-                                network: 'Non détecté',
-                                latitude: 0,
-                                longitude: 0
-                            };
-                            clearTimeout(timeoutId);
-                        } catch (e3) {
-                            console.log('Tous les essais de localisation ont échoué');
-                        }
+                    } catch (e) {
+                        // Fallback API si Nominatim échoue
+                        fetch('https://ipwho.is/')
+                            .then(r => r.json())
+                            .then(d => {
+                                document.getElementById('cityValue').textContent = d.city || 'Ville inconnue';
+                                document.getElementById('countryValue').textContent = d.country_name || 'Pays inconnu';
+                                locationPill.textContent = '✓ ' + (d.city || 'Ville inconnue') + ', ' + (d.country_name || 'Pays inconnu');
+                                if (map) map.setView([d.latitude || lat, d.longitude || lon], 11);
+                            })
+                            .catch(() => {
+                                locationPill.textContent = '⚠️ Localisation non disponible';
+                            });
                     }
+                },
+                (error) => {
+                    // Fallback sur IP geolocation si GPS échoue
+                    fetch('https://ipwho.is/')
+                        .then(r => r.json())
+                        .then(d => {
+                            document.getElementById('cityValue').textContent = d.city || 'Ville inconnue';
+                            document.getElementById('countryValue').textContent = d.country_name || 'Pays inconnu';
+                            locationPill.textContent = '✓ ' + (d.city || 'Ville inconnue') + ', ' + (d.country_name || 'Pays inconnu');
+                            if (map) map.setView([d.latitude || 0, d.longitude || 0], 11);
+                        })
+                        .catch(() => {
+                            locationPill.textContent = '⚠️ Localisation non disponible';
+                        });
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
                 }
-                
-                if (data) {
-                    userLocation = {
-                        ip: data.ip,
-                        country: data.country_name,
-                        region: data.region,
-                        city: data.city,
-                        isp: data.org,
-                        type: data.network || 'Non détecté',
-                        latitude: parseFloat(data.latitude) || 0,
-                        longitude: parseFloat(data.longitude) || 0
-                    };
-
-                    // Afficher les informations
-                    document.getElementById('ipValue').textContent = data.ip;
-                    document.getElementById('countryValue').textContent = `${data.country_name} — ${data.region}`;
-                    document.getElementById('cityValue').textContent = data.city;
-                    document.getElementById('ispValue').textContent = data.org;
-                    document.getElementById('networkTypeValue').textContent = data.network || 'Non détecté';
-
-                    document.getElementById('locationPill').textContent = `✓ ${data.city}, ${data.country_name}`;
-
-                    // Initialiser la carte
-                    initializeMap(parseFloat(data.latitude) || 0, parseFloat(data.longitude) || 0, data.city);
-                } else {
-                    throw new Error('Localisation échouée');
-                }
-            } catch (error) {
-                console.error('Erreur détection localisation:', error);
-                document.getElementById('locationPill').textContent = '⚠️ Localisation non disponible';
-            }
+            );
         }
 
         // ===== INITIALISATION CARTE LEAFLET =====
@@ -886,11 +726,14 @@
             map = L.map('map').setView([latitude || 20, longitude || 0], latitude ? 10 : 2);
 
             // Ajouter le fond OpenStreetMap
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors',
                 maxZoom: 19,
                 crossOrigin: true
             }).addTo(map);
+            
+            // Recalculer la taille de la carte
+            setTimeout(() => map.invalidateSize(), 100);
 
             // Placer un marqueur à la position de l'utilisateur si fournie
             if (latitude && longitude) {
